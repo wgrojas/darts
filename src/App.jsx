@@ -1,211 +1,601 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import "./App.css";
 
-const pinturas = [
-  { id: 1, titulo: "Pintura 1", precio: 350000, imagen: "1.jpeg" },
-  { id: 2, titulo: "Pintura 2", precio: 420000, imagen: "2.jpeg" },
-  { id: 3, titulo: "Pintura 3", precio: 450000, imagen: "3.jpeg" },
-  { id: 4, titulo: "Pintura 4", precio: 500000, imagen: "4.jpeg" },
-  { id: 5, titulo: "Pintura 5", precio: 380000, imagen: "5.jpeg" },
-  { id: 6, titulo: "Pintura 6", precio: 550000, imagen: "6.jpeg" },
-  { id: 7, titulo: "Pintura 7", precio: 470000, imagen: "7.jpeg" },
-  { id: 8, titulo: "Pintura 8", precio: 600000, imagen: "8.jpeg" },
-  { id: 9, titulo: "Pintura 9", precio: 390000, imagen: "9.jpeg" },
-  { id: 10, titulo: "Pintura 10", precio: 480000, imagen: "10.jpeg" },
-  { id: 11, titulo: "Pintura 11", precio: 520000, imagen: "11.jpeg" },
-  { id: 12, titulo: "Pintura 12", precio: 430000, imagen: "12.jpeg" },
-  { id: 13, titulo: "Pintura 13", precio: 580000, imagen: "13.jpeg" },
-  { id: 14, titulo: "Pintura 14", precio: 650000, imagen: "14.jpeg" },
-];
+// =====================================================
+// CONFIGURACIÓN DEL BACKEND
+// =====================================================
 
-function formatearPrecio(precio) {
-  return new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    maximumFractionDigits: 0,
-  }).format(precio);
-}
+const API_URL = "http://localhost:3000";
+
+// =====================================================
+// APLICACIÓN
+// =====================================================
 
 function App() {
-  const [pinturaSeleccionada, setPinturaSeleccionada] = useState(null);
+  // ===================================================
+  // ESTADOS
+  // ===================================================
+
+  const [pinturas, setPinturas] = useState([]);
+
+  const [cargando, setCargando] = useState(true);
+
+  const [error, setError] = useState("");
+
+  const [pinturaSeleccionada, setPinturaSeleccionada] =
+    useState(null);
+
+  const [favoritos, setFavoritos] = useState([]);
+
   const [carrito, setCarrito] = useState([]);
 
-  const agregarAlCarrito = (pintura) => {
-    const existe = carrito.some((item) => item.id === pintura.id);
+  const [mostrarCarrito, setMostrarCarrito] =
+    useState(false);
 
-    if (existe) {
-      alert("Esta pintura ya está en el carrito.");
+  // ===================================================
+  // CARGAR PINTURAS DESDE MYSQL
+  // ===================================================
+
+  useEffect(() => {
+    obtenerPinturas();
+  }, []);
+
+  const obtenerPinturas = async () => {
+    try {
+      setCargando(true);
+      setError("");
+
+      const respuesta = await axios.get(
+        `${API_URL}/api/pinturas`
+      );
+
+      setPinturas(respuesta.data);
+    } catch (error) {
+      console.error(
+        "Error obteniendo las pinturas:",
+        error
+      );
+
+      setError(
+        "No fue posible conectar con el servidor."
+      );
+    } finally {
+      setCargando(false);
+    }
+  };
+
+  // ===================================================
+  // FORMATEAR PRECIO
+  // ===================================================
+
+  const formatearPrecio = (precio) => {
+    return new Intl.NumberFormat("es-CO", {
+      style: "currency",
+      currency: "COP",
+      maximumFractionDigits: 0,
+    }).format(Number(precio));
+  };
+
+  // ===================================================
+  // OBTENER URL DE IMAGEN
+  // ===================================================
+
+  const obtenerImagen = (imagen) => {
+    return `${API_URL}/uploads/pinturas/${imagen}`;
+  };
+
+  // ===================================================
+  // FAVORITOS
+  // ===================================================
+
+  const alternarFavorito = (id) => {
+    setFavoritos((actuales) => {
+      if (actuales.includes(id)) {
+        return actuales.filter(
+          (favorito) => favorito !== id
+        );
+      }
+
+      return [...actuales, id];
+    });
+  };
+
+  // ===================================================
+  // AGREGAR AL CARRITO
+  // ===================================================
+
+  const agregarAlCarrito = (pintura) => {
+    if (pintura.estado !== "disponible") {
+      alert("Esta pintura no está disponible.");
       return;
     }
 
-    setCarrito([...carrito, pintura]);
+    if (Number(pintura.stock) <= 0) {
+      alert("Esta pintura está agotada.");
+      return;
+    }
 
-    alert(`${pintura.titulo} fue agregada al carrito.`);
+    const existe = carrito.find(
+      (item) => item.id === pintura.id
+    );
+
+    if (existe) {
+      alert(
+        "Esta pintura ya se encuentra en el carrito."
+      );
+      return;
+    }
+
+    const nuevaPintura = {
+      id: pintura.id,
+      titulo: pintura.titulo,
+      descripcion: pintura.descripcion,
+      precio: Number(pintura.precio),
+      imagen: pintura.imagen,
+      stock: Number(pintura.stock),
+      estado: pintura.estado,
+      cantidad: 1,
+    };
+
+    setCarrito((actual) => [
+      ...actual,
+      nuevaPintura,
+    ]);
+
+    alert("Pintura agregada al carrito.");
   };
 
-  const comprarAhora = (pintura) => {
-    setCarrito([pintura]);
+  // ===================================================
+  // ELIMINAR DEL CARRITO
+  // ===================================================
 
-    alert(
-      `Has seleccionado ${pintura.titulo} por ${formatearPrecio(
-        pintura.precio
-      )}`
+  const eliminarDelCarrito = (id) => {
+    setCarrito((actual) =>
+      actual.filter((item) => item.id !== id)
     );
   };
+
+  // ===================================================
+  // TOTAL DEL CARRITO
+  // ===================================================
+
+  const calcularTotal = () => {
+    return carrito.reduce(
+      (total, item) =>
+        total +
+        Number(item.precio) *
+          Number(item.cantidad),
+      0
+    );
+  };
+
+  // ===================================================
+  // CANTIDAD DE PRODUCTOS
+  // ===================================================
+
+  const cantidadCarrito = carrito.reduce(
+    (total, item) =>
+      total + Number(item.cantidad),
+    0
+  );
+
+  // ===================================================
+  // COMPRAR AHORA
+  // ===================================================
+
+  const comprarAhora = (pintura) => {
+    if (pintura.estado !== "disponible") {
+      alert("Esta pintura no está disponible.");
+      return;
+    }
+
+    if (Number(pintura.stock) <= 0) {
+      alert("Esta pintura está agotada.");
+      return;
+    }
+
+    const producto = {
+      id: pintura.id,
+      titulo: pintura.titulo,
+      descripcion: pintura.descripcion,
+      precio: Number(pintura.precio),
+      imagen: pintura.imagen,
+      stock: Number(pintura.stock),
+      estado: pintura.estado,
+      cantidad: 1,
+    };
+
+    setCarrito([producto]);
+
+    setPinturaSeleccionada(null);
+
+    setMostrarCarrito(true);
+  };
+
+  // ===================================================
+  // IR A GALERÍA
+  // ===================================================
+
+  const irAGaleria = () => {
+    const galeria =
+      document.getElementById("galeria");
+
+    if (galeria) {
+      galeria.scrollIntoView({
+        behavior: "smooth",
+      });
+    }
+  };
+
+  // ===================================================
+  // RENDER
+  // ===================================================
 
   return (
     <div className="app">
 
-      {/* ================= HEADER ================= */}
+      {/* =================================================
+          HEADER
+      ================================================= */}
 
       <header className="header">
 
         <div className="logo">
-          <h1>dartsGallery</h1>
-          <span>Galería de Arte</span>
+          <span>dRojas</span>
+          <strong>Galery</strong>
         </div>
 
-        <nav>
-          <a href="#inicio">Inicio</a>
-          <a href="#galeria">Galería</a>
-          <a href="#nosotros">Nosotros</a>
-          <a href="#contacto">Contacto</a>
-        </nav>
+        <nav className="nav">
 
-        <button className="cart">
-          🛒 Carrito ({carrito.length})
-        </button>
+          <a href="#inicio">
+            Inicio
+          </a>
+
+          <a href="#galeria">
+            Galería
+          </a>
+
+          <a href="#nosotros">
+            Nosotros
+          </a>
+
+          <button
+            className="cart-button"
+            onClick={() =>
+              setMostrarCarrito(true)
+            }
+          >
+            🛒 Carrito
+
+            {cantidadCarrito > 0 && (
+              <span className="cart-count">
+                {cantidadCarrito}
+              </span>
+            )}
+          </button>
+
+        </nav>
 
       </header>
 
-      {/* ================= HERO ================= */}
+      {/* =================================================
+          HERO
+      ================================================= */}
 
-      <section id="inicio" className="hero">
+      <section
+        id="inicio"
+        className="hero"
+      >
+
+        <img
+          src={obtenerImagen("1.jpeg")}
+          alt="Obra original de Duvan Rojas"
+          className="hero-image"
+        />
+
+        <div className="hero-overlay"></div>
 
         <div className="hero-content">
 
-          <p className="subtitle">
-            ARTE • PASIÓN • CREATIVIDAD
+          <p className="hero-subtitle">
+            ARTE ORIGINAL
           </p>
 
-          <h2>
-            Obras que transforman
+          <h1>
+            Obras originales
             <br />
-            espacios y emociones
-          </h2>
+            de Duvan Rojas
+          </h1>
 
           <p>
-            Descubre nuestra colección de pinturas originales
-            creadas para quienes valoran el arte.
+            Descubre una colección de pinturas
+            originales creadas para quienes
+            buscan expresar su personalidad
+            a través del arte.
           </p>
 
-          <a href="#galeria" className="hero-button">
-            Explorar galería
-          </a>
+          <button
+            className="hero-button"
+            onClick={irAGaleria}
+          >
+            Explorar colección
+          </button>
 
         </div>
 
       </section>
 
-      {/* ================= GALERÍA ================= */}
+      {/* =================================================
+          NOSOTROS
+      ================================================= */}
 
-      <section id="galeria" className="gallery-section">
+      <section
+        id="nosotros"
+        className="intro"
+      >
 
-        <div className="section-title">
-
-          <p>COLECCIÓN</p>
-
-          <h2>Nuestras pinturas</h2>
-
-          <span>
-            Descubre piezas únicas para darle personalidad a tus espacios.
-          </span>
-
-        </div>
-
-        <div className="gallery-grid">
-
-          {pinturas.map((pintura) => (
-
-            <article
-              className="painting-card"
-              key={pintura.id}
-            >
-
-              <div className="image-container">
-
-                <img
-                  src={`/images/${pintura.imagen}`}
-                  alt={pintura.titulo}
-                />
-
-                <button className="favorite">
-                  ♡
-                </button>
-
-              </div>
-
-              <div className="painting-info">
-
-                <h3>{pintura.titulo}</h3>
-
-                <p className="price">
-                  {formatearPrecio(pintura.precio)}
-                </p>
-
-                <button
-                  className="details-button"
-                  onClick={() =>
-                    setPinturaSeleccionada(pintura)
-                  }
-                >
-                  Ver pintura
-                </button>
-
-              </div>
-
-            </article>
-
-          ))}
-
-        </div>
-
-      </section>
-
-      {/* ================= NOSOTROS ================= */}
-
-      <section id="nosotros" className="about">
-
-        <p>SOBRE NOSOTROS</p>
+        <p className="section-label">
+          D ROJAS GALERY
+        </p>
 
         <h2>
-          Arte creado para ser parte de tu historia
+          Arte que transforma espacios
         </h2>
 
         <p>
-          En dRojasGalery buscamos conectar a las personas
-          con pinturas únicas, creadas con pasión y dedicación.
+          Cada obra es una pieza original de
+          Duvan Rojas, creada para quienes
+          buscan expresar su personalidad
+          a través del arte.
         </p>
 
       </section>
 
-      {/* ================= FOOTER ================= */}
+      {/* =================================================
+          GALERÍA
+      ================================================= */}
 
-      <footer id="contacto">
+      <section
+        id="galeria"
+        className="gallery-section"
+      >
 
-        <h2>dartsGallery</h2>
+        <div className="section-header">
 
-        <p>
-          Galería de pinturas originales
-        </p>
+          <div>
 
-        <p>
-          © 2026 dartsGallery
-        </p>
+            <p className="section-label">
+              COLECCIÓN
+            </p>
 
-      </footer>
+            <h2>
+              Obras disponibles
+            </h2>
 
-      {/* ================= MODAL ================= */}
+          </div>
+
+          <p className="gallery-description">
+            Explora nuestra colección de obras
+            originales de Duvan Rojas.
+          </p>
+
+        </div>
+
+        {/* =================================================
+            CARGANDO
+        ================================================= */}
+
+        {cargando && (
+
+          <div className="status-message">
+
+            <div className="spinner"></div>
+
+            <p>
+              Cargando obras...
+            </p>
+
+          </div>
+
+        )}
+
+        {/* =================================================
+            ERROR
+        ================================================= */}
+
+        {!cargando && error && (
+
+          <div className="error-message">
+
+            <p>
+              {error}
+            </p>
+
+            <button
+              onClick={obtenerPinturas}
+            >
+              Intentar nuevamente
+            </button>
+
+          </div>
+
+        )}
+
+        {/* =================================================
+            PINTURAS
+        ================================================= */}
+
+        {!cargando &&
+          !error &&
+          pinturas.length > 0 && (
+
+            <div className="gallery-grid">
+
+              {pinturas.map((pintura) => (
+
+                <article
+                  className="painting-card"
+                  key={pintura.id}
+                >
+
+                  {/* IMAGEN */}
+
+                  <div className="painting-image-container">
+
+                    <img
+                      src={obtenerImagen(
+                        pintura.imagen
+                      )}
+                      alt={pintura.titulo}
+                      className="painting-image"
+                    />
+
+                    {/* FAVORITO */}
+
+                    <button
+                      className={`favorite-button ${
+                        favoritos.includes(
+                          pintura.id
+                        )
+                          ? "active"
+                          : ""
+                      }`}
+                      onClick={() =>
+                        alternarFavorito(
+                          pintura.id
+                        )
+                      }
+                    >
+                      {favoritos.includes(
+                        pintura.id
+                      )
+                        ? "♥"
+                        : "♡"}
+                    </button>
+
+                    {/* ORIGINAL */}
+
+                    <span className="original-badge">
+                      ORIGINAL
+                    </span>
+
+                  </div>
+
+                  {/* INFORMACIÓN */}
+
+                  <div className="painting-info">
+
+                    <h3>
+                      {pintura.titulo}
+                    </h3>
+
+                    <p className="artist">
+                      Duvan Rojas
+                    </p>
+
+                    <p className="description">
+                      {pintura.descripcion}
+                    </p>
+
+                    <div className="painting-bottom">
+
+                      <strong className="price">
+                        {formatearPrecio(
+                          pintura.precio
+                        )}
+                      </strong>
+
+                      <span
+                        className={
+                          pintura.estado ===
+                            "disponible" &&
+                          Number(
+                            pintura.stock
+                          ) > 0
+                            ? "available"
+                            : "sold"
+                        }
+                      >
+                        {pintura.estado ===
+                            "disponible" &&
+                        Number(
+                          pintura.stock
+                        ) > 0
+                          ? "Disponible"
+                          : "No disponible"}
+                      </span>
+
+                    </div>
+
+                    {/* BOTONES */}
+
+                    <div className="card-buttons">
+
+                      <button
+                        className="view-button"
+                        onClick={() =>
+                          setPinturaSeleccionada(
+                            pintura
+                          )
+                        }
+                      >
+                        Ver pintura
+                      </button>
+
+                      <button
+                        className="add-button"
+                        onClick={() =>
+                          agregarAlCarrito(
+                            pintura
+                          )
+                        }
+                        disabled={
+                          pintura.estado !==
+                            "disponible" ||
+                          Number(
+                            pintura.stock
+                          ) <= 0
+                        }
+                      >
+                        Agregar
+                      </button>
+
+                    </div>
+
+                  </div>
+
+                </article>
+
+              ))}
+
+            </div>
+
+          )}
+
+        {/* =================================================
+            SIN PINTURAS
+        ================================================= */}
+
+        {!cargando &&
+          !error &&
+          pinturas.length === 0 && (
+
+            <div className="status-message">
+
+              <p>
+                No hay pinturas disponibles.
+              </p>
+
+            </div>
+
+          )}
+
+      </section>
+
+      {/* =================================================
+          MODAL DE PINTURA
+      ================================================= */}
 
       {pinturaSeleccionada && (
 
@@ -218,13 +608,13 @@ function App() {
 
           <div
             className="painting-modal"
-            onClick={(e) =>
-              e.stopPropagation()
+            onClick={(event) =>
+              event.stopPropagation()
             }
           >
 
             <button
-              className="close-modal"
+              className="modal-close"
               onClick={() =>
                 setPinturaSeleccionada(null)
               }
@@ -232,33 +622,38 @@ function App() {
               ×
             </button>
 
-            {/* IMAGEN */}
-
             <div className="modal-image-container">
 
               <img
-                src={`/images/${pinturaSeleccionada.imagen}`}
-                alt={pinturaSeleccionada.titulo}
+                src={obtenerImagen(
+                  pinturaSeleccionada.imagen
+                )}
+                alt={
+                  pinturaSeleccionada.titulo
+                }
+                className="modal-image"
               />
 
             </div>
 
-            {/* INFORMACIÓN */}
-
             <div className="modal-info">
 
-              <p className="modal-category">
+              <span className="modal-label">
                 PINTURA ORIGINAL
-              </p>
+              </span>
 
               <h2>
                 {pinturaSeleccionada.titulo}
               </h2>
 
+              <p className="modal-artist">
+                Duvan Rojas
+              </p>
+
               <p className="modal-description">
-                Obra original disponible para compra.
-                Cada pintura es una pieza única creada
-                para darle personalidad y estilo a tus espacios.
+                {
+                  pinturaSeleccionada.descripcion
+                }
               </p>
 
               <div className="modal-price">
@@ -267,29 +662,51 @@ function App() {
                 )}
               </div>
 
-              <p className="modal-currency">
-                Precio en pesos colombianos
+              <p className="modal-stock">
+
+                {pinturaSeleccionada.estado ===
+                    "disponible" &&
+                Number(
+                  pinturaSeleccionada.stock
+                ) > 0
+                  ? "✓ Disponible"
+                  : "✕ No disponible"}
+
               </p>
 
-              <div className="purchase-buttons">
+              <div className="modal-buttons">
 
                 <button
-                  className="add-cart"
+                  className="add-button large"
                   onClick={() =>
                     agregarAlCarrito(
                       pinturaSeleccionada
                     )
                   }
+                  disabled={
+                    pinturaSeleccionada.estado !==
+                      "disponible" ||
+                    Number(
+                      pinturaSeleccionada.stock
+                    ) <= 0
+                  }
                 >
-                  🛒 Agregar al carrito
+                  Agregar al carrito
                 </button>
 
                 <button
-                  className="buy-now"
+                  className="buy-button"
                   onClick={() =>
                     comprarAhora(
                       pinturaSeleccionada
                     )
+                  }
+                  disabled={
+                    pinturaSeleccionada.estado !==
+                      "disponible" ||
+                    Number(
+                      pinturaSeleccionada.stock
+                    ) <= 0
                   }
                 >
                   Comprar ahora
@@ -304,6 +721,230 @@ function App() {
         </div>
 
       )}
+
+      {/* =================================================
+          CARRITO
+      ================================================= */}
+
+      {mostrarCarrito && (
+
+        <div
+          className="cart-overlay"
+          onClick={() =>
+            setMostrarCarrito(false)
+          }
+        >
+
+          <aside
+            className="cart-panel"
+            onClick={(event) =>
+              event.stopPropagation()
+            }
+          >
+
+            <div className="cart-header">
+
+              <h2>
+                Mi carrito
+              </h2>
+
+              <button
+                className="cart-close"
+                onClick={() =>
+                  setMostrarCarrito(false)
+                }
+              >
+                ×
+              </button>
+
+            </div>
+
+            {/* CARRITO VACÍO */}
+
+            {carrito.length === 0 ? (
+
+              <div className="empty-cart">
+
+                <div className="empty-cart-icon">
+                  🛒
+                </div>
+
+                <h3>
+                  Tu carrito está vacío
+                </h3>
+
+                <p>
+                  Agrega una obra de nuestra
+                  colección.
+                </p>
+
+                <button
+                  className="hero-button"
+                  onClick={() =>
+                    setMostrarCarrito(false)
+                  }
+                >
+                  Ver colección
+                </button>
+
+              </div>
+
+            ) : (
+
+              <>
+
+                {/* PRODUCTOS */}
+
+                <div className="cart-items">
+
+                  {carrito.map((item) => (
+
+                    <div
+                      className="cart-item"
+                      key={item.id}
+                    >
+
+                      <img
+                        src={obtenerImagen(
+                          item.imagen
+                        )}
+                        alt={item.titulo}
+                      />
+
+                      <div className="cart-item-info">
+
+                        <h3>
+                          {item.titulo}
+                        </h3>
+
+                        <p>
+                          Duvan Rojas
+                        </p>
+
+                        <strong>
+                          {formatearPrecio(
+                            item.precio
+                          )}
+                        </strong>
+
+                        <button
+                          className="remove-button"
+                          onClick={() =>
+                            eliminarDelCarrito(
+                              item.id
+                            )
+                          }
+                        >
+                          Eliminar
+                        </button>
+
+                      </div>
+
+                    </div>
+
+                  ))}
+
+                </div>
+
+                {/* TOTAL */}
+
+                <div className="cart-footer">
+
+                  <div className="cart-total">
+
+                    <span>
+                      Total
+                    </span>
+
+                    <strong>
+                      {formatearPrecio(
+                        calcularTotal()
+                      )}
+                    </strong>
+
+                  </div>
+
+                  <button
+                    className="checkout-button"
+                    onClick={() =>
+                      alert(
+                        "El proceso de compra se conectará con pedidos y Wompi."
+                      )
+                    }
+                  >
+                    Continuar con la compra
+                  </button>
+
+                </div>
+
+              </>
+
+            )}
+
+          </aside>
+
+        </div>
+
+      )}
+
+      {/* =================================================
+          FOOTER
+      ================================================= */}
+
+      <footer className="footer">
+
+        <div className="footer-content">
+
+          <div>
+
+            <div className="logo footer-logo">
+
+              <span>
+                dRojas
+              </span>
+
+              <strong>
+                Galery
+              </strong>
+
+            </div>
+
+            <p>
+              Obras originales de Duvan Rojas.
+            </p>
+
+          </div>
+
+          <div className="footer-links">
+
+            <a href="#inicio">
+              Inicio
+            </a>
+
+            <a href="#galeria">
+              Galería
+            </a>
+
+            <a href="#nosotros">
+              Nosotros
+            </a>
+
+          </div>
+
+        </div>
+
+        <div className="footer-bottom">
+
+          <p>
+            © {new Date().getFullYear()}
+            {" "}
+            dRojasGalery. Todos los derechos
+            reservados.
+          </p>
+
+        </div>
+
+      </footer>
 
     </div>
   );
