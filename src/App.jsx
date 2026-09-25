@@ -4,7 +4,7 @@ import api from "./services/api";
 import Form from "./components/Form";
 import CompraForm from "./components/CompraForm";
 
-const SERVIDOR_URL = "http://localhost:3000";
+const SERVIDOR_URL = "http://192.168.1.14:3000";
 
 function formatearPrecio(precio) {
   return new Intl.NumberFormat("es-CO", {
