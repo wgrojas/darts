@@ -1,296 +1,814 @@
+/* =========================
+   GENERAL
+========================= */
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  font-family: Arial, Helvetica, sans-serif;
-  background: #f7f5f2;
+  font-family: Georgia, "Times New Roman", serif;
+  background: #ffffff;
   color: #222;
 }
 
-.app {
-  min-height: 100vh;
+button {
+  font-family: inherit;
+  cursor: pointer;
 }
 
-/* HEADER */
+a {
+  text-decoration: none;
+}
+
+
+/* =========================
+   HEADER
+========================= */
 
 .header {
-  height: 80px;
-  padding: 0 7%;
+  height: 120px;
+  background: #ffffff;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: white;
-  border-bottom: 1px solid #e5e5e5;
-  position: sticky;
-  top: 0;
-  z-index: 100;
+
+  padding: 0 7%;
+
+  position: relative;
+  z-index: 10;
+
+  border-bottom: 1px solid #eeeeee;
 }
 
+
+/* LOGO */
+
 .logo h1 {
-  font-family: Georgia, serif;
-  font-size: 25px;
+  font-size: 30px;
+  font-weight: normal;
+  margin-bottom: 3px;
+  color: #111;
 }
 
 .logo span {
-  font-size: 11px;
-  letter-spacing: 3px;
+  font-family: Arial, sans-serif;
+  font-size: 12px;
   color: #777;
+  letter-spacing: 2px;
 }
 
-nav {
+
+/* MENU */
+
+.header nav {
   display: flex;
   gap: 35px;
 }
 
-nav a {
-  text-decoration: none;
-  color: #333;
+.header nav a {
+  font-family: Arial, sans-serif;
   font-size: 14px;
+  color: #333;
+
+  transition: color 0.3s ease;
 }
 
-nav a:hover {
+.header nav a:hover {
   color: #9b6b43;
 }
+
+
+/* CARRITO */
 
 .cart {
   background: #222;
   color: white;
+
   border: none;
-  padding: 12px 20px;
+
+  padding: 13px 22px;
+
   border-radius: 4px;
-  cursor: pointer;
+
+  font-family: Arial, sans-serif;
+  font-size: 14px;
 }
 
-/* HERO */
+.cart:hover {
+  background: #9b6b43;
+}
+
+
+/* =========================
+   HERO
+========================= */
 
 .hero {
-  min-height: 520px;
+  height: 520px;
+
+  position: relative;
+
   display: flex;
   align-items: center;
-  padding: 80px 10%;
-  background:
+  justify-content: center;
+
+  text-align: center;
+
+  background-image:
     linear-gradient(
-      rgba(0, 0, 0, 0.45),
-      rgba(0, 0, 0, 0.45)
+      rgba(0, 0, 0, 0.48),
+      rgba(0, 0, 0, 0.48)
     ),
-    url("/images/1.jpeg") center/cover;
+    url("/images/1.jpeg");
+
+  background-size: cover;
+  background-position: center;
+
   color: white;
 }
 
+
+/* CONTENIDO */
+
 .hero-content {
-  max-width: 650px;
+  max-width: 800px;
+  padding: 30px;
+  position: relative;
+  z-index: 2;
 }
+
+
+/* SUBTÍTULO */
 
 .subtitle {
+  font-family: Arial, sans-serif;
+
+  font-size: 15px;
+
   letter-spacing: 4px;
-  font-size: 12px;
-  margin-bottom: 20px;
+
+  margin-bottom: 28px;
+
+  color: white;
 }
+
+
+/* TÍTULO */
 
 .hero h2 {
-  font-family: Georgia, serif;
   font-size: 52px;
-  line-height: 1.1;
+
+  line-height: 1.15;
+
+  font-weight: normal;
+
   margin-bottom: 25px;
+
+  color: white;
 }
 
-.hero p {
-  font-size: 17px;
+
+/* DESCRIPCIÓN */
+
+.hero-content > p:last-of-type {
+  font-family: Arial, sans-serif;
+
+  font-size: 16px;
+
   line-height: 1.7;
+
+  max-width: 650px;
+
+  margin: 0 auto 30px;
+
+  color: white;
 }
+
+
+/* BOTÓN HERO */
 
 .hero-button {
-  margin-top: 30px;
-  padding: 15px 30px;
-  border: none;
+  display: inline-block;
+
   background: white;
+
   color: #222;
-  cursor: pointer;
+
+  padding: 14px 30px;
+
+  font-family: Arial, sans-serif;
+
+  font-size: 14px;
+
+  transition: all 0.3s ease;
 }
 
-/* GALERIA */
+.hero-button:hover {
+  background: #9b6b43;
+  color: white;
+}
+
+
+/* =========================
+   GALERÍA
+========================= */
 
 .gallery-section {
   padding: 90px 7%;
+  background: #ffffff;
 }
+
+
+/* TÍTULO */
 
 .section-title {
   text-align: center;
+
   margin-bottom: 50px;
 }
 
-.section-title p {
-  font-size: 12px;
-  letter-spacing: 4px;
+.section-title > p {
+  font-family: Arial, sans-serif;
+
   color: #9b6b43;
+
+  font-size: 12px;
+
+  letter-spacing: 3px;
+
+  margin-bottom: 12px;
 }
 
 .section-title h2 {
-  font-family: Georgia, serif;
-  font-size: 40px;
-  margin: 12px 0;
+  font-size: 38px;
+
+  font-weight: normal;
+
+  margin-bottom: 12px;
 }
 
 .section-title span {
+  font-family: Arial, sans-serif;
+
   color: #777;
+
+  font-size: 14px;
 }
 
+
+/* =========================
+   GRID DE CARDS
+========================= */
+
 .gallery-grid {
+  max-width: 1200px;
+
+  margin: 0 auto;
+
   display: grid;
+
   grid-template-columns: repeat(4, 1fr);
+
   gap: 25px;
 }
 
+
+/* =========================
+   CARD
+========================= */
+
 .painting-card {
   background: white;
-  overflow: hidden;
-  transition: 0.3s;
+
+  border: 1px solid #e8e8e8;
+
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .painting-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.12);
 }
 
+
+/* =========================
+   IMAGEN CARD
+========================= */
+
 .image-container {
-  height: 330px;
+  width: 100%;
+
+  height: 260px;
+
   position: relative;
+
   overflow: hidden;
+
   background: #eee;
 }
 
 .image-container img {
   width: 100%;
+
   height: 100%;
+
   object-fit: cover;
-  transition: 0.4s;
+
+  display: block;
+
+  transition: transform 0.4s ease;
 }
 
-.painting-card:hover img {
-  transform: scale(1.05);
+.painting-card:hover
+.image-container img {
+  transform: scale(1.04);
 }
+
+
+/* FAVORITO */
 
 .favorite {
   position: absolute;
-  right: 15px;
-  top: 15px;
+
+  top: 12px;
+
+  right: 12px;
+
   width: 38px;
+
   height: 38px;
-  border: none;
+
   border-radius: 50%;
-  background: white;
+
+  border: none;
+
+  background: rgba(255, 255, 255, 0.9);
+
   font-size: 22px;
-  cursor: pointer;
+
+  color: #333;
 }
+
+.favorite:hover {
+  color: #9b6b43;
+}
+
+
+/* =========================
+   INFORMACIÓN CARD
+========================= */
 
 .painting-info {
   padding: 20px;
 }
 
 .painting-info h3 {
-  font-family: Georgia, serif;
-  font-size: 20px;
+  font-size: 18px;
+
+  font-weight: normal;
+
   margin-bottom: 10px;
 }
 
 .price {
+  font-family: Arial, sans-serif;
+
+  color: #9b6b43;
+
+  font-size: 18px;
+
   font-weight: bold;
-  margin-bottom: 15px;
+
+  margin-bottom: 18px;
 }
+
+
+/* BOTÓN DETALLE */
 
 .details-button {
   width: 100%;
-  padding: 11px;
-  border: 1px solid #222;
-  background: transparent;
-  cursor: pointer;
+
+  background: #222;
+
+  color: white;
+
+  border: none;
+
+  padding: 12px;
+
+  font-family: Arial, sans-serif;
+
+  font-size: 13px;
 }
 
 .details-button:hover {
-  background: #222;
-  color: white;
+  background: #9b6b43;
 }
 
-/* ABOUT */
+
+/* =========================
+   NOSOTROS
+========================= */
 
 .about {
-  padding: 100px 20%;
+  padding: 100px 15%;
+
+  background: #f6f3ef;
+
   text-align: center;
-  background: white;
 }
 
 .about > p:first-child {
-  letter-spacing: 4px;
-  font-size: 12px;
+  font-family: Arial, sans-serif;
+
   color: #9b6b43;
+
+  font-size: 12px;
+
+  letter-spacing: 3px;
+
+  margin-bottom: 15px;
 }
 
 .about h2 {
-  font-family: Georgia, serif;
   font-size: 38px;
-  margin: 15px 0;
+
+  font-weight: normal;
+
+  margin-bottom: 20px;
 }
 
-.about p:last-child {
+.about > p:last-child {
+  max-width: 700px;
+
+  margin: 0 auto;
+
+  font-family: Arial, sans-serif;
+
   color: #666;
+
   line-height: 1.8;
 }
 
-/* FOOTER */
+
+/* =========================
+   FOOTER
+========================= */
 
 footer {
-  padding: 50px 7%;
   background: #222;
+
   color: white;
+
   text-align: center;
+
+  padding: 50px 20px;
+}
+
+footer h2 {
+  font-size: 25px;
+
+  font-weight: normal;
+
+  margin-bottom: 10px;
 }
 
 footer p {
-  margin-top: 10px;
+  font-family: Arial, sans-serif;
+
   color: #aaa;
+
+  font-size: 13px;
+
+  margin-bottom: 8px;
 }
 
-/* RESPONSIVE */
+
+/* =========================
+   MODAL
+========================= */
+
+.modal-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0.75);
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 25px;
+
+  z-index: 1000;
+
+  overflow-y: auto;
+}
+
+
+/* CONTENEDOR */
+
+.painting-modal {
+  width: 900px;
+
+  max-width: 100%;
+
+  background: white;
+
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  position: relative;
+
+  border-radius: 6px;
+
+  overflow: hidden;
+
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+
+/* CERRAR */
+
+.close-modal {
+  position: absolute;
+
+  top: 12px;
+
+  right: 12px;
+
+  width: 40px;
+
+  height: 40px;
+
+  border: none;
+
+  border-radius: 50%;
+
+  background: rgba(0, 0, 0, 0.7);
+
+  color: white;
+
+  font-size: 27px;
+
+  z-index: 5;
+}
+
+.close-modal:hover {
+  background: #9b6b43;
+}
+
+
+/* =========================
+   IMAGEN MODAL
+========================= */
+
+.modal-image-container {
+  height: 550px;
+
+  background: #eee;
+}
+
+.modal-image-container img {
+  width: 100%;
+
+  height: 100%;
+
+  object-fit: cover;
+
+  display: block;
+}
+
+
+/* =========================
+   INFORMACIÓN MODAL
+========================= */
+
+.modal-info {
+  padding: 55px 40px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: center;
+}
+
+.modal-category {
+  font-family: Arial, sans-serif;
+
+  color: #9b6b43;
+
+  font-size: 12px;
+
+  letter-spacing: 2px;
+
+  margin-bottom: 15px;
+}
+
+.modal-info h2 {
+  font-size: 34px;
+
+  font-weight: normal;
+
+  margin-bottom: 20px;
+}
+
+.modal-description {
+  font-family: Arial, sans-serif;
+
+  color: #666;
+
+  line-height: 1.7;
+
+  margin-bottom: 25px;
+}
+
+.modal-price {
+  color: #9b6b43;
+
+  font-family: Arial, sans-serif;
+
+  font-size: 28px;
+
+  font-weight: bold;
+
+  margin-bottom: 7px;
+}
+
+.modal-currency {
+  font-family: Arial, sans-serif;
+
+  color: #888;
+
+  font-size: 13px;
+
+  margin-bottom: 25px;
+}
+
+
+/* =========================
+   BOTONES COMPRA
+========================= */
+
+.purchase-buttons {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 12px;
+}
+
+.add-cart,
+.buy-now {
+  width: 100%;
+
+  padding: 14px;
+
+  font-family: Arial, sans-serif;
+
+  font-size: 14px;
+
+  border-radius: 4px;
+}
+
+.add-cart {
+  background: white;
+
+  color: #222;
+
+  border: 1px solid #222;
+}
+
+.add-cart:hover {
+  background: #222;
+
+  color: white;
+}
+
+.buy-now {
+  background: #9b6b43;
+
+  color: white;
+
+  border: 1px solid #9b6b43;
+}
+
+.buy-now:hover {
+  background: #7c4f2e;
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
 
 @media (max-width: 1000px) {
+
+  .gallery-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .header {
+    padding: 0 4%;
+  }
+
+}
+
+
+@media (max-width: 800px) {
+
+  .header {
+    height: auto;
+
+    padding: 20px;
+
+    flex-direction: column;
+
+    gap: 18px;
+  }
+
+  .header nav {
+    gap: 18px;
+  }
+
+  .hero {
+    height: 500px;
+  }
+
+  .hero h2 {
+    font-size: 40px;
+  }
 
   .gallery-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  nav {
-    display: none;
+  .painting-modal {
+    grid-template-columns: 1fr;
+
+    max-height: 90vh;
+
+    overflow-y: auto;
+  }
+
+  .modal-image-container {
+    height: 350px;
   }
 
 }
 
-@media (max-width: 600px) {
 
-  .header {
-    padding: 0 20px;
+@media (max-width: 550px) {
+
+  .header nav {
+    display: none;
   }
 
   .hero {
-    padding: 60px 25px;
+    height: 500px;
   }
 
   .hero h2 {
-    font-size: 38px;
+    font-size: 34px;
   }
 
-  .gallery-section {
-    padding: 60px 20px;
+  .subtitle {
+    font-size: 12px;
+    letter-spacing: 2px;
   }
 
   .gallery-grid {
     grid-template-columns: 1fr;
   }
 
+  .image-container {
+    height: 320px;
+  }
+
+  .gallery-section {
+    padding: 70px 6%;
+  }
+
   .about {
-    padding: 70px 25px;
+    padding: 70px 8%;
   }
 
 }
