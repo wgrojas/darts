@@ -1,0 +1,296 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f7f5f2;
+  color: #222;
+}
+
+.app {
+  min-height: 100vh;
+}
+
+/* HEADER */
+
+.header {
+  height: 80px;
+  padding: 0 7%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: white;
+  border-bottom: 1px solid #e5e5e5;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo h1 {
+  font-family: Georgia, serif;
+  font-size: 25px;
+}
+
+.logo span {
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: #777;
+}
+
+nav {
+  display: flex;
+  gap: 35px;
+}
+
+nav a {
+  text-decoration: none;
+  color: #333;
+  font-size: 14px;
+}
+
+nav a:hover {
+  color: #9b6b43;
+}
+
+.cart {
+  background: #222;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* HERO */
+
+.hero {
+  min-height: 520px;
+  display: flex;
+  align-items: center;
+  padding: 80px 10%;
+  background:
+    linear-gradient(
+      rgba(0, 0, 0, 0.45),
+      rgba(0, 0, 0, 0.45)
+    ),
+    url("/images/1.jpeg") center/cover;
+  color: white;
+}
+
+.hero-content {
+  max-width: 650px;
+}
+
+.subtitle {
+  letter-spacing: 4px;
+  font-size: 12px;
+  margin-bottom: 20px;
+}
+
+.hero h2 {
+  font-family: Georgia, serif;
+  font-size: 52px;
+  line-height: 1.1;
+  margin-bottom: 25px;
+}
+
+.hero p {
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.hero-button {
+  margin-top: 30px;
+  padding: 15px 30px;
+  border: none;
+  background: white;
+  color: #222;
+  cursor: pointer;
+}
+
+/* GALERIA */
+
+.gallery-section {
+  padding: 90px 7%;
+}
+
+.section-title {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.section-title p {
+  font-size: 12px;
+  letter-spacing: 4px;
+  color: #9b6b43;
+}
+
+.section-title h2 {
+  font-family: Georgia, serif;
+  font-size: 40px;
+  margin: 12px 0;
+}
+
+.section-title span {
+  color: #777;
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 25px;
+}
+
+.painting-card {
+  background: white;
+  overflow: hidden;
+  transition: 0.3s;
+}
+
+.painting-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+.image-container {
+  height: 330px;
+  position: relative;
+  overflow: hidden;
+  background: #eee;
+}
+
+.image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: 0.4s;
+}
+
+.painting-card:hover img {
+  transform: scale(1.05);
+}
+
+.favorite {
+  position: absolute;
+  right: 15px;
+  top: 15px;
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 50%;
+  background: white;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.painting-info {
+  padding: 20px;
+}
+
+.painting-info h3 {
+  font-family: Georgia, serif;
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.price {
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.details-button {
+  width: 100%;
+  padding: 11px;
+  border: 1px solid #222;
+  background: transparent;
+  cursor: pointer;
+}
+
+.details-button:hover {
+  background: #222;
+  color: white;
+}
+
+/* ABOUT */
+
+.about {
+  padding: 100px 20%;
+  text-align: center;
+  background: white;
+}
+
+.about > p:first-child {
+  letter-spacing: 4px;
+  font-size: 12px;
+  color: #9b6b43;
+}
+
+.about h2 {
+  font-family: Georgia, serif;
+  font-size: 38px;
+  margin: 15px 0;
+}
+
+.about p:last-child {
+  color: #666;
+  line-height: 1.8;
+}
+
+/* FOOTER */
+
+footer {
+  padding: 50px 7%;
+  background: #222;
+  color: white;
+  text-align: center;
+}
+
+footer p {
+  margin-top: 10px;
+  color: #aaa;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1000px) {
+
+  .gallery-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  nav {
+    display: none;
+  }
+
+}
+
+@media (max-width: 600px) {
+
+  .header {
+    padding: 0 20px;
+  }
+
+  .hero {
+    padding: 60px 25px;
+  }
+
+  .hero h2 {
+    font-size: 38px;
+  }
+
+  .gallery-section {
+    padding: 60px 20px;
+  }
+
+  .gallery-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .about {
+    padding: 70px 25px;
+  }
+
+}
