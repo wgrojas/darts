@@ -1,10 +1,165 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import "./App.css";
-import api from "./services/api";
-import Form from "./components/form";
-import CompraForm from "./components/CompraForm";
 
-const SERVIDOR_URL = "http://localhost:3000";
+// ======================================================
+// TELEGRAM — SOLO PARA PRUEBAS
+// ======================================================
+
+const TELEGRAM_BOT_TOKEN = "8985483042:AAGBz_Er0vSONsVDkvOZdmdrcxfURhmtyKc";
+const TELEGRAM_CHAT_ID = "8626488038";
+
+const enviarTelegram = async (mensaje) => {
+  try {
+    const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+
+    const respuesta = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT_ID,
+        text: mensaje,
+      }),
+    });
+
+    const datos = await respuesta.json();
+
+    if (!datos.ok) {
+      console.error("Error Telegram:", datos);
+      return false;
+    }
+
+    console.log("✓ Mensaje enviado a Telegram");
+    return true;
+  } catch (error) {
+    console.error("Error conectando con Telegram:", error);
+    return false;
+  }
+};
+
+// ======================================================
+// PINTURAS
+// ======================================================
+
+const pinturasIniciales = [
+  {
+    id: 1,
+    titulo: "Pintura 1",
+    descripcion: "Obra original de la colección dartsGallery.",
+    precio: 850000,
+    imagen: "/images/1.jpeg",
+    stock: 1,
+  },
+  {
+    id: 2,
+    titulo: "Pintura 2",
+    descripcion: "Obra original de la colección dartsGallery.",
+    precio: 900000,
+    imagen: "/images/2.jpeg",
+    stock: 1,
+  },
+  {
+    id: 3,
+    titulo: "Pintura 3",
+    descripcion: "Obra original de la colección dartsGallery.",
+    precio: 950000,
+    imagen: "/images/3.jpeg",
+    stock: 1,
+  },
+  {
+    id: 4,
+    titulo: "Pintura 4",
+    descripcion: "Obra original de la colección dartsGallery.",
+    precio: 850000,
+    imagen: "/images/4.jpeg",
+    stock: 1,
+  },
+  {
+    id: 5,
+    titulo: "Pintura 5",
+    descripcion: "Obra original de la colección dartsGallery.",
+    precio: 1000000,
+    imagen: "/images/5.jpeg",
+    stock: 1,
+  },
+  {
+    id: 6,
+    titulo: "Pintura 6",
+    descripcion: "Obra original de la colección dartsGallery.",
+    precio: 950000,
+    imagen: "/images/6.jpeg",
+    stock: 1,
+  },
+  {
+    id: 7,
+    titulo: "Pintura 7",
+    descripcion: "Obra original de la colección dartsGallery.",
+    precio: 900000,
+    imagen: "/images/7.jpeg",
+    stock: 1,
+  },
+  {
+    id: 8,
+    titulo: "Pintura 8",
+    descripcion: "Obra original de la colección dartsGallery.",
+    precio: 1100000,
+    imagen: "/images/8.jpeg",
+    stock: 1,
+  },
+  {
+    id: 9,
+    titulo: "Pintura 9",
+    descripcion: "Obra original de la colección dartsGallery.",
+    precio: 850000,
+    imagen: "/images/9.jpeg",
+    stock: 1,
+  },
+  {
+    id: 10,
+    titulo: "Pintura 10",
+    descripcion: "Obra original de la colección dartsGallery.",
+    precio: 950000,
+    imagen: "/images/10.jpeg",
+    stock: 1,
+  },
+  {
+    id: 11,
+    titulo: "Pintura 11",
+    descripcion: "Obra original de la colección dartsGallery.",
+    precio: 1000000,
+    imagen: "/images/11.jpeg",
+    stock: 1,
+  },
+  {
+    id: 12,
+    titulo: "Pintura 12",
+    descripcion: "Obra original de la colección dartsGallery.",
+    precio: 900000,
+    imagen: "/images/12.jpeg",
+    stock: 1,
+  },
+  {
+    id: 13,
+    titulo: "Pintura 13",
+    descripcion: "Obra original de la colección dartsGallery.",
+    precio: 1200000,
+    imagen: "/images/13.jpeg",
+    stock: 1,
+  },
+  {
+    id: 14,
+    titulo: "Pintura 14",
+    descripcion: "Obra original de la colección dartsGallery.",
+    precio: 1000000,
+    imagen: "/images/14.jpeg",
+    stock: 1,
+  },
+];
+
+// ======================================================
+// UTILIDADES
+// ======================================================
 
 function formatearPrecio(precio) {
   return new Intl.NumberFormat("es-CO", {
@@ -14,12 +169,12 @@ function formatearPrecio(precio) {
   }).format(precio);
 }
 
-function App() {
-  // =========================
-  // ESTADOS
-  // =========================
+// ======================================================
+// APP
+// ======================================================
 
-  const [pinturas, setPinturas] = useState([]);
+function App() {
+  const [pinturas] = useState(pinturasIniciales);
 
   const [pinturaSeleccionada, setPinturaSeleccionada] =
     useState(null);
@@ -35,64 +190,9 @@ function App() {
   const [compraAbierta, setCompraAbierta] =
     useState(false);
 
-  const [cargando, setCargando] =
-    useState(true);
-
-  const [error, setError] =
-    useState("");
-
-  // =========================
-  // OBTENER PINTURAS
-  // =========================
-
-  useEffect(() => {
-    const obtenerPinturas = async () => {
-      try {
-        setCargando(true);
-        setError("");
-
-        const respuesta =
-          await api.get("/pinturas");
-
-        setPinturas(respuesta.data);
-
-      } catch (err) {
-        console.error(
-          "Error obteniendo pinturas:",
-          err
-        );
-
-        setError(
-          "No fue posible cargar las pinturas. Verifica que el servidor backend esté funcionando."
-        );
-
-      } finally {
-        setCargando(false);
-      }
-    };
-
-    obtenerPinturas();
-  }, []);
-
-  // =========================
-  // IMAGEN
-  // =========================
-
-  const obtenerImagen = (imagen) => {
-    if (!imagen) {
-      return "";
-    }
-
-    if (imagen.startsWith("http")) {
-      return imagen;
-    }
-
-    return `${SERVIDOR_URL}/uploads/pinturas/${imagen}`;
-  };
-
-  // =========================
+  // ----------------------------------------------------
   // AGREGAR AL CARRITO
-  // =========================
+  // ----------------------------------------------------
 
   const agregarAlCarrito = (pintura) => {
     const existe = carrito.some(
@@ -100,109 +200,450 @@ function App() {
     );
 
     if (existe) {
-      alert(
-        "Esta pintura ya está en el carrito."
-      );
+      alert("Esta pintura ya está en el carrito.");
       return;
     }
 
-    setCarrito([
-      ...carrito,
-      pintura,
-    ]);
+    setCarrito([...carrito, pintura]);
 
     setPinturaSeleccionada(null);
-
     setCarritoAbierto(true);
   };
 
-  // =========================
+  // ----------------------------------------------------
   // COMPRAR AHORA
-  // =========================
+  // ----------------------------------------------------
 
   const comprarAhora = (pintura) => {
     setCarrito([pintura]);
-
     setPinturaSeleccionada(null);
-
-    setCarritoAbierto(true);
-  };
-
-  // =========================
-  // ELIMINAR DEL CARRITO
-  // =========================
-
-  const eliminarDelCarrito = (id) => {
-    setCarrito(
-      carrito.filter(
-        (item) => item.id !== id
-      )
-    );
-  };
-
-  // =========================
-  // TOTAL CARRITO
-  // =========================
-
-  const totalCarrito =
-    carrito.reduce(
-      (total, pintura) =>
-        total + Number(pintura.precio),
-      0
-    );
-
-  // =========================
-  // ABRIR FORMULARIO COMPRA
-  // =========================
-
-  const abrirFormularioCompra = () => {
-    if (carrito.length === 0) {
-      alert(
-        "Tu carrito está vacío."
-      );
-      return;
-    }
-
-    setCarritoAbierto(false);
-
     setCompraAbierta(true);
   };
 
-  // =========================
-  // CERRAR FORMULARIO COMPRA
-  // =========================
+  // ----------------------------------------------------
+  // ELIMINAR
+  // ----------------------------------------------------
 
-  const cerrarFormularioCompra = () => {
-    setCompraAbierta(false);
+  const eliminarDelCarrito = (id) => {
+    setCarrito(
+      carrito.filter((item) => item.id !== id)
+    );
   };
 
-  // =========================
-  // RENDER
-  // =========================
+  // ----------------------------------------------------
+  // TOTAL
+  // ----------------------------------------------------
+
+  const totalCarrito = carrito.reduce(
+    (total, pintura) =>
+      total + Number(pintura.precio),
+    0
+  );
+
+  // ====================================================
+  // FORMULARIO DE CONTACTO
+  // ====================================================
+
+  const FormularioContacto = () => {
+    const [datos, setDatos] = useState({
+      nombre: "",
+      email: "",
+      telefono: "",
+      asunto: "",
+      mensaje: "",
+    });
+
+    const [enviando, setEnviando] = useState(false);
+
+    const manejarCambio = (e) => {
+      setDatos({
+        ...datos,
+        [e.target.name]: e.target.value,
+      });
+    };
+
+    const enviarFormulario = async (e) => {
+      e.preventDefault();
+
+      setEnviando(true);
+
+      const mensaje = `
+📩 NUEVO MENSAJE - dartsGallery
+
+👤 CLIENTE
+Nombre: ${datos.nombre}
+Correo: ${datos.email}
+Teléfono: ${datos.telefono || "No indicado"}
+
+📌 ASUNTO
+${datos.asunto || "Sin asunto"}
+
+💬 MENSAJE
+${datos.mensaje}
+`;
+
+      const enviado = await enviarTelegram(mensaje);
+
+      setEnviando(false);
+
+      if (enviado) {
+        alert(
+          "Mensaje enviado correctamente."
+        );
+
+        setDatos({
+          nombre: "",
+          email: "",
+          telefono: "",
+          asunto: "",
+          mensaje: "",
+        });
+
+        setContactoAbierto(false);
+      } else {
+        alert(
+          "No fue posible enviar el mensaje a Telegram."
+        );
+      }
+    };
+
+    return (
+      <form
+        className="contact-form"
+        onSubmit={enviarFormulario}
+      >
+        <div className="form-row">
+          <div className="form-group">
+            <label>Nombre</label>
+
+            <input
+              type="text"
+              name="nombre"
+              value={datos.nombre}
+              onChange={manejarCambio}
+              placeholder="Tu nombre"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Correo electrónico</label>
+
+            <input
+              type="email"
+              name="email"
+              value={datos.email}
+              onChange={manejarCambio}
+              placeholder="tu@email.com"
+              required
+            />
+          </div>
+        </div>
+
+        <div className="form-group">
+          <label>Teléfono</label>
+
+          <input
+            type="tel"
+            name="telefono"
+            value={datos.telefono}
+            onChange={manejarCambio}
+            placeholder="300 000 0000"
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Asunto</label>
+
+          <input
+            type="text"
+            name="asunto"
+            value={datos.asunto}
+            onChange={manejarCambio}
+            placeholder="¿En qué podemos ayudarte?"
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Mensaje</label>
+
+          <textarea
+            name="mensaje"
+            rows="5"
+            value={datos.mensaje}
+            onChange={manejarCambio}
+            placeholder="Escribe tu mensaje..."
+            required
+          />
+        </div>
+
+        <button
+          type="submit"
+          className="contact-button"
+          disabled={enviando}
+        >
+          {enviando
+            ? "Enviando..."
+            : "Enviar mensaje"}
+        </button>
+      </form>
+    );
+  };
+
+  // ====================================================
+  // FORMULARIO DE COMPRA
+  // ====================================================
+
+  const FormularioCompra = () => {
+    const [datos, setDatos] = useState({
+      nombre: "",
+      email: "",
+      telefono: "",
+      direccion: "",
+      ciudad: "",
+      observaciones: "",
+    });
+
+    const [enviando, setEnviando] = useState(false);
+
+    const pintura = carrito[0];
+
+    if (!pintura) return null;
+
+    const manejarCambio = (e) => {
+      setDatos({
+        ...datos,
+        [e.target.name]: e.target.value,
+      });
+    };
+
+    const enviarPedido = async (e) => {
+      e.preventDefault();
+
+      setEnviando(true);
+
+      const numeroPedido =
+        Date.now().toString().slice(-6);
+
+      const mensaje = `
+🛒 NUEVO PEDIDO - dartsGallery
+
+📦 Pedido: #${numeroPedido}
+
+🎨 OBRA
+${pintura.titulo}
+
+💰 TOTAL
+${formatearPrecio(totalCarrito)}
+
+👤 CLIENTE
+Nombre: ${datos.nombre}
+Correo: ${datos.email}
+Teléfono: ${datos.telefono}
+
+📍 ENTREGA
+Dirección: ${datos.direccion}
+Ciudad: ${datos.ciudad}
+
+📝 OBSERVACIONES
+${datos.observaciones || "Sin observaciones"}
+
+📋 ESTADO
+Pendiente de pago
+`;
+
+      const enviado = await enviarTelegram(mensaje);
+
+      setEnviando(false);
+
+      if (enviado) {
+        alert(
+          `Pedido #${numeroPedido} registrado correctamente.`
+        );
+
+        setCompraAbierta(false);
+        setCarrito([]);
+      } else {
+        alert(
+          "No fue posible enviar el pedido a Telegram."
+        );
+      }
+    };
+
+    return (
+      <div
+        className="purchase-modal-overlay"
+        onClick={() => setCompraAbierta(false)}
+      >
+        <div
+          className="purchase-modal"
+          onClick={(e) =>
+            e.stopPropagation()
+          }
+        >
+          <button
+            className="purchase-close"
+            onClick={() =>
+              setCompraAbierta(false)
+            }
+          >
+            ×
+          </button>
+
+          <div className="purchase-header">
+            <p>FINALIZAR COMPRA</p>
+
+            <h2>Datos de entrega</h2>
+
+            <span>
+              Completa tus datos para registrar
+              tu pedido.
+            </span>
+          </div>
+
+          <div className="purchase-summary">
+            <img
+              src={pintura.imagen}
+              alt={pintura.titulo}
+            />
+
+            <div>
+              <h3>{pintura.titulo}</h3>
+
+              <strong>
+                {formatearPrecio(
+                  pintura.precio
+                )}
+              </strong>
+            </div>
+          </div>
+
+          <form
+            className="purchase-form"
+            onSubmit={enviarPedido}
+          >
+            <div className="form-row">
+              <div className="form-group">
+                <label>
+                  Nombre completo
+                </label>
+
+                <input
+                  type="text"
+                  name="nombre"
+                  value={datos.nombre}
+                  onChange={manejarCambio}
+                  placeholder="Tu nombre completo"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label>
+                  Correo electrónico
+                </label>
+
+                <input
+                  type="email"
+                  name="email"
+                  value={datos.email}
+                  onChange={manejarCambio}
+                  placeholder="tu@email.com"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label>Teléfono</label>
+
+                <input
+                  type="tel"
+                  name="telefono"
+                  value={datos.telefono}
+                  onChange={manejarCambio}
+                  placeholder="300 000 0000"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Ciudad</label>
+
+                <input
+                  type="text"
+                  name="ciudad"
+                  value={datos.ciudad}
+                  onChange={manejarCambio}
+                  placeholder="Bucaramanga"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label>
+                Dirección de entrega
+              </label>
+
+              <input
+                type="text"
+                name="direccion"
+                value={datos.direccion}
+                onChange={manejarCambio}
+                placeholder="Dirección de entrega"
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Observaciones</label>
+
+              <textarea
+                name="observaciones"
+                value={datos.observaciones}
+                onChange={manejarCambio}
+                placeholder="Información adicional..."
+                rows="4"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="purchase-button"
+              disabled={enviando}
+            >
+              {enviando
+                ? "Enviando pedido..."
+                : "Registrar pedido"}
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  };
+
+  // ====================================================
+  // INTERFAZ
+  // ====================================================
 
   return (
     <div className="app">
 
-      {/* ==================================================
-          HEADER
-      ================================================== */}
+      {/* HEADER */}
 
       <header className="header">
 
         <div className="logo">
-
-          <h1>
-            dartsGallery
-          </h1>
+          <h1>dartsGallery</h1>
 
           <span>
             Galería de Arte
           </span>
-
         </div>
 
         <nav>
-
           <a href="#inicio">
             Inicio
           </a>
@@ -224,7 +665,6 @@ function App() {
           >
             Contacto
           </a>
-
         </nav>
 
         <button
@@ -233,22 +673,17 @@ function App() {
             setCarritoAbierto(true)
           }
         >
-          🛒 Carrito (
-          {carrito.length}
-          )
+          🛒 Carrito ({carrito.length})
         </button>
 
       </header>
 
-      {/* ==================================================
-          HERO
-      ================================================== */}
+      {/* HERO */}
 
       <section
         id="inicio"
         className="hero"
       >
-
         <div className="hero-content">
 
           <p className="subtitle">
@@ -262,10 +697,9 @@ function App() {
           </h2>
 
           <p>
-            Descubre nuestra colección
-            de pinturas originales
-            creadas para quienes
-            valoran el arte.
+            Descubre nuestra colección de
+            pinturas originales creadas para
+            quienes valoran el arte.
           </p>
 
           <a
@@ -276,12 +710,9 @@ function App() {
           </a>
 
         </div>
-
       </section>
 
-      {/* ==================================================
-          GALERÍA
-      ================================================== */}
+      {/* GALERÍA */}
 
       <section
         id="galeria"
@@ -290,179 +721,107 @@ function App() {
 
         <div className="section-title">
 
-          <p>
-            COLECCIÓN
-          </p>
+          <p>COLECCIÓN</p>
 
           <h2>
             Nuestras pinturas
           </h2>
 
           <span>
-            Descubre piezas únicas para
-            darle personalidad a tus
-            espacios.
+            Descubre piezas únicas para darle
+            personalidad a tus espacios.
           </span>
 
         </div>
 
-        {/* CARGANDO */}
+        <div className="gallery-grid">
 
-        {cargando && (
+          {pinturas.map((pintura) => (
 
-          <div className="mensaje-carga">
+            <article
+              className="painting-card"
+              key={pintura.id}
+            >
 
-            Cargando pinturas...
+              <div className="image-container">
 
-          </div>
+                <img
+                  src={pintura.imagen}
+                  alt={pintura.titulo}
+                />
 
-        )}
+                <button
+                  className="favorite"
+                  type="button"
+                >
+                  ♡
+                </button>
 
-        {/* ERROR */}
+              </div>
 
-        {!cargando && error && (
+              <div className="painting-info">
 
-          <div className="mensaje-error">
+                <h3>
+                  {pintura.titulo}
+                </h3>
 
-            {error}
+                <p className="price">
+                  {formatearPrecio(
+                    pintura.precio
+                  )}
+                </p>
 
-          </div>
+                <button
+                  className="details-button"
+                  onClick={() =>
+                    setPinturaSeleccionada(
+                      pintura
+                    )
+                  }
+                >
+                  Ver pintura
+                </button>
 
-        )}
+              </div>
 
-        {/* PINTURAS */}
+            </article>
 
-        {!cargando &&
-          !error &&
-          pinturas.length > 0 && (
+          ))}
 
-            <div className="gallery-grid">
-
-              {pinturas.map(
-                (pintura) => (
-
-                  <article
-                    className="painting-card"
-                    key={pintura.id}
-                  >
-
-                    <div className="image-container">
-
-                      <img
-                        src={obtenerImagen(
-                          pintura.imagen
-                        )}
-                        alt={
-                          pintura.titulo
-                        }
-                      />
-
-                      <button
-                        className="favorite"
-                        type="button"
-                        aria-label="Agregar a favoritos"
-                      >
-                        ♡
-                      </button>
-
-                    </div>
-
-                    <div className="painting-info">
-
-                      <h3>
-                        {pintura.titulo}
-                      </h3>
-
-                      <p className="price">
-
-                        {formatearPrecio(
-                          pintura.precio
-                        )}
-
-                      </p>
-
-                      <button
-                        className="details-button"
-                        onClick={() =>
-                          setPinturaSeleccionada(
-                            pintura
-                          )
-                        }
-                      >
-                        Ver pintura
-                      </button>
-
-                    </div>
-
-                  </article>
-
-                )
-              )}
-
-            </div>
-
-          )}
-
-        {/* SIN PINTURAS */}
-
-        {!cargando &&
-          !error &&
-          pinturas.length === 0 && (
-
-            <div className="mensaje-carga">
-
-              No hay pinturas
-              disponibles.
-
-            </div>
-
-          )}
+        </div>
 
       </section>
 
-      {/* ==================================================
-          NOSOTROS
-      ================================================== */}
+      {/* NOSOTROS */}
 
       <section
         id="nosotros"
         className="about"
       >
 
-        <p>
-          SOBRE NOSOTROS
-        </p>
+        <p>SOBRE NOSOTROS</p>
 
         <h2>
-          Arte creado para ser
-          parte de tu historia
+          Arte creado para ser parte
+          de tu historia
         </h2>
 
         <p>
-          En dRojasGalery buscamos
-          conectar a las personas
-          con pinturas únicas,
-          creadas con pasión
-          y dedicación.
+          En dartsGallery buscamos conectar
+          a las personas con pinturas únicas,
+          creadas con pasión y dedicación.
         </p>
 
       </section>
 
-      {/* ==================================================
-          FOOTER
-      ================================================== */}
+      {/* FOOTER */}
 
-      <footer
-        id="contacto"
-      >
+      <footer id="contacto">
 
-        <h2>
-          dartsGallery
-        </h2>
+        <h2>dartsGallery</h2>
 
         <p>
-          Galería de pinturas
-          originales
+          Galería de pinturas originales
         </p>
 
         <p>
@@ -471,18 +830,16 @@ function App() {
 
       </footer>
 
-      {/* ==================================================
-          MODAL DETALLE DE PINTURA
-      ================================================== */}
+      {/* =================================================
+          MODAL PINTURA
+      ================================================= */}
 
       {pinturaSeleccionada && (
 
         <div
           className="modal-overlay"
           onClick={() =>
-            setPinturaSeleccionada(
-              null
-            )
+            setPinturaSeleccionada(null)
           }
         >
 
@@ -493,36 +850,27 @@ function App() {
             }
           >
 
-            {/* CERRAR */}
-
             <button
               className="close-modal"
               onClick={() =>
-                setPinturaSeleccionada(
-                  null
-                )
+                setPinturaSeleccionada(null)
               }
-              aria-label="Cerrar"
             >
               ×
             </button>
 
-            {/* IMAGEN */}
-
             <div className="modal-image-container">
 
               <img
-                src={obtenerImagen(
+                src={
                   pinturaSeleccionada.imagen
-                )}
+                }
                 alt={
                   pinturaSeleccionada.titulo
                 }
               />
 
             </div>
-
-            {/* INFORMACIÓN */}
 
             <div className="modal-info">
 
@@ -535,18 +883,15 @@ function App() {
               </h2>
 
               <p className="modal-description">
-
-                {pinturaSeleccionada.descripcion ||
-                  "Obra original disponible para compra. Cada pintura es una pieza única creada para darle personalidad y estilo a tus espacios."}
-
+                {
+                  pinturaSeleccionada.descripcion
+                }
               </p>
 
               <div className="modal-price">
-
                 {formatearPrecio(
                   pinturaSeleccionada.precio
                 )}
-
               </div>
 
               <p className="modal-currency">
@@ -587,9 +932,9 @@ function App() {
 
       )}
 
-      {/* ==================================================
+      {/* =================================================
           CARRITO
-      ================================================== */}
+      ================================================= */}
 
       {carritoAbierto && (
 
@@ -607,8 +952,6 @@ function App() {
             }
           >
 
-            {/* CABECERA */}
-
             <div className="cart-header">
 
               <h2>
@@ -620,14 +963,11 @@ function App() {
                 onClick={() =>
                   setCarritoAbierto(false)
                 }
-                aria-label="Cerrar carrito"
               >
                 ×
               </button>
 
             </div>
-
-            {/* CARRITO VACÍO */}
 
             {carrito.length === 0 ? (
 
@@ -642,8 +982,8 @@ function App() {
                 </h3>
 
                 <p>
-                  Agrega una obra de
-                  nuestra colección.
+                  Agrega una obra de nuestra
+                  colección.
                 </p>
 
               </div>
@@ -652,60 +992,50 @@ function App() {
 
               <>
 
-                {/* PRODUCTOS */}
-
                 <div className="cart-items">
 
-                  {carrito.map(
-                    (pintura) => (
+                  {carrito.map((pintura) => (
 
-                      <div
-                        className="cart-item"
-                        key={pintura.id}
-                      >
+                    <div
+                      className="cart-item"
+                      key={pintura.id}
+                    >
 
-                        <img
-                          src={obtenerImagen(
-                            pintura.imagen
+                      <img
+                        src={pintura.imagen}
+                        alt={pintura.titulo}
+                      />
+
+                      <div className="cart-item-info">
+
+                        <h3>
+                          {pintura.titulo}
+                        </h3>
+
+                        <p>
+                          {formatearPrecio(
+                            pintura.precio
                           )}
-                          alt={
-                            pintura.titulo
+                        </p>
+
+                        <button
+                          className="remove-cart-item"
+                          onClick={() =>
+                            eliminarDelCarrito(
+                              pintura.id
+                            )
                           }
-                        />
-
-                        <div className="cart-item-info">
-
-                          <h3>
-                            {pintura.titulo}
-                          </h3>
-
-                          <p>
-                            {formatearPrecio(
-                              pintura.precio
-                            )}
-                          </p>
-
-                          <button
-                            className="remove-cart-item"
-                            onClick={() =>
-                              eliminarDelCarrito(
-                                pintura.id
-                              )
-                            }
-                          >
-                            Eliminar
-                          </button>
-
-                        </div>
+                        >
+                          Eliminar
+                        </button>
 
                       </div>
 
-                    )
-                  )}
+                    </div>
+
+                  ))}
 
                 </div>
-
-                {/* TOTAL */}
 
                 <div className="cart-footer">
 
@@ -725,9 +1055,10 @@ function App() {
 
                   <button
                     className="checkout-button"
-                    onClick={
-                      abrirFormularioCompra
-                    }
+                    onClick={() => {
+                      setCarritoAbierto(false);
+                      setCompraAbierta(true);
+                    }}
                   >
                     Continuar compra
                   </button>
@@ -744,9 +1075,9 @@ function App() {
 
       )}
 
-      {/* ==================================================
-          MODAL CONTACTO
-      ================================================== */}
+      {/* =================================================
+          CONTACTO
+      ================================================= */}
 
       {contactoAbierto && (
 
@@ -764,42 +1095,32 @@ function App() {
             }
           >
 
-            {/* CERRAR */}
-
             <button
               className="contact-close"
               onClick={() =>
                 setContactoAbierto(false)
               }
-              aria-label="Cerrar formulario de contacto"
             >
               ×
             </button>
 
-            {/* ENCABEZADO */}
-
             <div className="contact-modal-header">
 
-              <p>
-                CONTACTO
-              </p>
+              <p>CONTACTO</p>
 
               <h2>
                 Hablemos de arte
               </h2>
 
               <span>
-                ¿Tienes alguna pregunta
-                sobre nuestras obras?
-                Estamos aquí para
-                ayudarte.
+                ¿Tienes alguna pregunta sobre
+                nuestras obras? Estamos aquí
+                para ayudarte.
               </span>
 
             </div>
 
-            {/* FORMULARIO */}
-
-            <Form />
+            <FormularioContacto />
 
           </div>
 
@@ -807,21 +1128,13 @@ function App() {
 
       )}
 
-      {/* ==================================================
-          MODAL COMPRA
-      ================================================== */}
+      {/* =================================================
+          COMPRA
+      ================================================= */}
 
-      {compraAbierta &&
-        carrito.length > 0 && (
-
-          <CompraForm
-            pintura={carrito[0]}
-            onCerrar={
-              cerrarFormularioCompra
-            }
-          />
-
-        )}
+      {compraAbierta && (
+        <FormularioCompra />
+      )}
 
     </div>
   );
