@@ -61,7 +61,7 @@ function App() {
       <header className="header">
 
         <div className="logo">
-          <h1>dRojasGalery</h1>
+          <h1>dartsGallery</h1>
           <span>Galería de Arte</span>
         </div>
 
@@ -193,14 +193,14 @@ function App() {
 
       <footer id="contacto">
 
-        <h2>dRojasGalery</h2>
+        <h2>dartsGallery</h2>
 
         <p>
           Galería de pinturas originales
         </p>
 
         <p>
-          © 2026 dRojasGalery
+          © 2026 dartsGallery
         </p>
 
       </footer>
