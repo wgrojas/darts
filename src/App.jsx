@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 import api from "./services/api";
-import Form from "./components/form";
+import Form from "./components/Form";
 import CompraForm from "./components/CompraForm";
 
 const SERVIDOR_URL = "http://localhost:3000";
