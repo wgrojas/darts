@@ -419,6 +419,35 @@ a {
 
 
 /* =========================
+   MENSAJES API
+========================= */
+
+.mensaje-carga {
+  text-align: center;
+
+  font-family: Arial, sans-serif;
+
+  color: #777;
+
+  padding: 50px 20px;
+
+  font-size: 16px;
+}
+
+.mensaje-error {
+  text-align: center;
+
+  font-family: Arial, sans-serif;
+
+  color: #9b6b43;
+
+  padding: 50px 20px;
+
+  font-size: 16px;
+}
+
+
+/* =========================
    NOSOTROS
 ========================= */
 
@@ -717,6 +746,272 @@ footer p {
 
 
 /* =========================
+   CARRITO LATERAL
+========================= */
+
+.cart-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0.55);
+
+  z-index: 2000;
+}
+
+.cart-drawer {
+  position: absolute;
+
+  top: 0;
+
+  right: 0;
+
+  width: 400px;
+
+  max-width: 90%;
+
+  height: 100vh;
+
+  background: white;
+
+  display: flex;
+
+  flex-direction: column;
+
+  box-shadow:
+    -5px 0 20px rgba(0, 0, 0, 0.15);
+}
+
+
+/* CABECERA CARRITO */
+
+.cart-header {
+  height: 70px;
+
+  padding: 0 25px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  border-bottom: 1px solid #eeeeee;
+
+  flex-shrink: 0;
+}
+
+.cart-header h2 {
+  margin: 0;
+
+  font-size: 22px;
+
+  font-weight: normal;
+}
+
+.close-cart {
+  border: none;
+
+  background: transparent;
+
+  font-size: 25px;
+
+  color: #111;
+
+  cursor: pointer;
+
+  width: 35px;
+
+  height: 35px;
+}
+
+.close-cart:hover {
+  color: #9b6b43;
+}
+
+
+/* CARRITO VACÍO */
+
+.cart-empty {
+  flex: 1;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  text-align: center;
+
+  padding: 30px;
+}
+
+.cart-icon {
+  font-size: 42px;
+
+  margin-bottom: 18px;
+}
+
+.cart-empty h3 {
+  font-family: Georgia, "Times New Roman", serif;
+
+  font-size: 21px;
+
+  font-weight: normal;
+
+  margin-bottom: 10px;
+}
+
+.cart-empty p {
+  font-family: Arial, sans-serif;
+
+  color: #777;
+
+  font-size: 14px;
+}
+
+
+/* =========================
+   PRODUCTOS CARRITO
+========================= */
+
+.cart-items {
+  flex: 1;
+
+  overflow-y: auto;
+
+  padding: 20px;
+}
+
+.cart-item {
+  display: flex;
+
+  gap: 15px;
+
+  padding-bottom: 18px;
+
+  margin-bottom: 18px;
+
+  border-bottom: 1px solid #eeeeee;
+}
+
+.cart-item img {
+  width: 90px;
+
+  height: 100px;
+
+  object-fit: cover;
+
+  flex-shrink: 0;
+}
+
+.cart-item-info {
+  flex: 1;
+}
+
+.cart-item-info h3 {
+  font-size: 16px;
+
+  font-weight: normal;
+
+  margin-bottom: 8px;
+}
+
+.cart-item-info p {
+  font-family: Arial, sans-serif;
+
+  color: #9b6b43;
+
+  font-size: 15px;
+
+  font-weight: bold;
+
+  margin-bottom: 10px;
+}
+
+.remove-cart-item {
+  border: none;
+
+  background: transparent;
+
+  color: #777;
+
+  padding: 0;
+
+  font-family: Arial, sans-serif;
+
+  font-size: 12px;
+}
+
+.remove-cart-item:hover {
+  color: #9b6b43;
+}
+
+
+/* =========================
+   FOOTER CARRITO
+========================= */
+
+.cart-footer {
+  border-top: 1px solid #eeeeee;
+
+  padding: 20px 25px;
+
+  background: white;
+
+  flex-shrink: 0;
+}
+
+.cart-total {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  margin-bottom: 18px;
+
+  font-family: Arial, sans-serif;
+}
+
+.cart-total span {
+  color: #555;
+
+  font-size: 15px;
+}
+
+.cart-total strong {
+  color: #9b6b43;
+
+  font-size: 19px;
+}
+
+.checkout-button {
+  width: 100%;
+
+  padding: 14px;
+
+  border: none;
+
+  background: #222;
+
+  color: white;
+
+  font-family: Arial, sans-serif;
+
+  font-size: 14px;
+
+  border-radius: 4px;
+}
+
+.checkout-button:hover {
+  background: #9b6b43;
+}
+
+
+/* =========================
    RESPONSIVE
 ========================= */
 
@@ -773,6 +1068,10 @@ footer p {
     height: 350px;
   }
 
+  .cart-drawer {
+    width: 380px;
+  }
+
 }
 
 
@@ -792,6 +1091,7 @@ footer p {
 
   .subtitle {
     font-size: 12px;
+
     letter-spacing: 2px;
   }
 
@@ -809,6 +1109,888 @@ footer p {
 
   .about {
     padding: 70px 8%;
+  }
+
+  .cart-drawer {
+    width: 100%;
+
+    max-width: 100%;
+  }
+
+}
+
+/* ==================================================
+   MODAL CONTACTO
+================================================== */
+
+.contact-modal-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0.75);
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 25px;
+
+  z-index: 2500;
+
+  overflow-y: auto;
+}
+
+
+/* ==================================================
+   CONTENEDOR CONTACTO
+================================================== */
+
+.contact-modal {
+  width: 700px;
+
+  max-width: 100%;
+
+  max-height: 90vh;
+
+  overflow-y: auto;
+
+  background: #ffffff;
+
+  position: relative;
+
+  border-radius: 6px;
+
+  padding: 50px 45px;
+
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+
+/* ==================================================
+   BOTÓN CERRAR CONTACTO
+================================================== */
+
+.contact-close {
+  position: absolute;
+
+  top: 12px;
+
+  right: 12px;
+
+  width: 40px;
+
+  height: 40px;
+
+  border: none;
+
+  border-radius: 50%;
+
+  background: rgba(0, 0, 0, 0.7);
+
+  color: white;
+
+  font-size: 27px;
+
+  line-height: 40px;
+
+  text-align: center;
+
+  z-index: 5;
+
+  cursor: pointer;
+}
+
+.contact-close:hover {
+  background: #9b6b43;
+}
+
+
+/* ==================================================
+   ENCABEZADO CONTACTO
+================================================== */
+
+.contact-modal-header {
+  text-align: center;
+
+  margin-bottom: 35px;
+}
+
+
+.contact-modal-header p {
+  font-family: Arial, sans-serif;
+
+  color: #9b6b43;
+
+  font-size: 12px;
+
+  letter-spacing: 3px;
+
+  margin-bottom: 12px;
+}
+
+
+.contact-modal-header h2 {
+  font-size: 34px;
+
+  font-weight: normal;
+
+  margin-bottom: 12px;
+
+  color: #222;
+}
+
+
+.contact-modal-header span {
+  display: block;
+
+  font-family: Arial, sans-serif;
+
+  color: #777;
+
+  font-size: 14px;
+
+  line-height: 1.6;
+}
+
+/* ==================================================
+   FORMULARIO DE CONTACTO - ESTILO DARTSGALLERY
+================================================== */
+
+.contact-form {
+  width: 100%;
+}
+
+/* FILA DE CAMPOS */
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+}
+
+/* GRUPO */
+
+.form-group {
+  margin-bottom: 22px;
+}
+
+/* LABEL */
+
+.form-group label {
+  display: block;
+  margin-bottom: 9px;
+
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+
+  color: #333;
+}
+
+/* INPUTS Y TEXTAREA */
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: 14px 16px;
+
+  border: 1px solid #ded9d3;
+  border-radius: 4px;
+
+  background: #faf9f7;
+
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+
+  color: #222;
+
+  outline: none;
+
+  transition:
+    border-color 0.25s ease,
+    background 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+/* PLACEHOLDER */
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #aaa;
+  font-size: 13px;
+}
+
+/* FOCUS */
+
+.form-group input:focus,
+.form-group textarea:focus {
+  background: #fff;
+
+  border-color: #9b6b43;
+
+  box-shadow:
+    0 0 0 3px rgba(155, 107, 67, 0.10);
+}
+
+/* TEXTAREA */
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 135px;
+  line-height: 1.6;
+}
+
+/* BOTÓN */
+
+.contact-button {
+  width: 100%;
+
+  padding: 15px 20px;
+
+  border: none;
+  border-radius: 4px;
+
+  background: #222;
+  color: #fff;
+
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+
+  letter-spacing: 1px;
+  text-transform: uppercase;
+
+  cursor: pointer;
+
+  transition:
+    background 0.3s ease,
+    transform 0.2s ease,
+    box-shadow 0.3s ease;
+}
+
+/* HOVER */
+
+.contact-button:hover {
+  background: #9b6b43;
+
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 7px 18px rgba(0, 0, 0, 0.15);
+}
+
+/* CLICK */
+
+.contact-button:active {
+  transform: translateY(0);
+}
+
+/* DESHABILITADO */
+
+.contact-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+
+/* ==================================================
+   MODAL CONTACTO
+================================================== */
+
+.contact-modal-overlay {
+  position: fixed;
+  inset: 0;
+
+  background: rgba(20, 18, 16, 0.78);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 25px;
+
+  z-index: 2500;
+
+  overflow-y: auto;
+}
+
+
+/* CONTENEDOR DEL MODAL */
+
+.contact-modal {
+  position: relative;
+
+  width: 680px;
+  max-width: 100%;
+
+  max-height: 90vh;
+
+  overflow-y: auto;
+
+  background: #fff;
+
+  padding: 52px 50px 45px;
+
+  border-radius: 5px;
+
+  box-shadow:
+    0 25px 70px rgba(0, 0, 0, 0.35);
+
+  animation: contactModalEntrada 0.3s ease;
+}
+
+
+/* ANIMACIÓN */
+
+@keyframes contactModalEntrada {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+
+/* BOTÓN CERRAR */
+
+.contact-close {
+  position: absolute;
+
+  top: 15px;
+  right: 15px;
+
+  width: 36px;
+  height: 36px;
+
+  border: none;
+  border-radius: 50%;
+
+  background: #f3f1ee;
+
+  color: #333;
+
+  font-size: 25px;
+  font-weight: 300;
+
+  line-height: 34px;
+
+  cursor: pointer;
+
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    transform 0.2s ease;
+}
+
+.contact-close:hover {
+  background: #9b6b43;
+  color: #fff;
+
+  transform: rotate(90deg);
+}
+
+
+/* ==================================================
+   ENCABEZADO DEL FORMULARIO
+================================================== */
+
+.contact-modal-header {
+  text-align: center;
+
+  margin-bottom: 38px;
+}
+
+
+/* PEQUEÑO TÍTULO */
+
+.contact-modal-header p {
+  margin: 0 0 12px;
+
+  font-family: Arial, sans-serif;
+
+  color: #9b6b43;
+
+  font-size: 11px;
+  font-weight: 600;
+
+  letter-spacing: 3px;
+}
+
+
+/* TÍTULO PRINCIPAL */
+
+.contact-modal-header h2 {
+  margin: 0 0 14px;
+
+  color: #222;
+
+  font-family: Georgia, "Times New Roman", serif;
+
+  font-size: 34px;
+  font-weight: normal;
+
+  line-height: 1.2;
+}
+
+
+/* DESCRIPCIÓN */
+
+.contact-modal-header span {
+  display: block;
+
+  max-width: 480px;
+
+  margin: 0 auto;
+
+  font-family: Arial, sans-serif;
+
+  color: #777;
+
+  font-size: 13px;
+
+  line-height: 1.7;
+}
+
+
+/* ==================================================
+   LÍNEA DECORATIVA
+================================================== */
+
+.contact-modal-header::after {
+  content: "";
+
+  display: block;
+
+  width: 45px;
+  height: 1px;
+
+  background: #9b6b43;
+
+  margin: 24px auto 0;
+}
+
+
+/* ==================================================
+   RESPONSIVE
+================================================== */
+
+@media (max-width: 800px) {
+
+  .contact-modal {
+    padding: 48px 32px 35px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+}
+
+
+/* CELULARES */
+
+@media (max-width: 550px) {
+
+  .contact-modal-overlay {
+    padding: 12px;
+  }
+
+  .contact-modal {
+    width: 100%;
+
+    max-height: 94vh;
+
+    padding: 45px 22px 30px;
+  }
+
+  .contact-modal-header {
+    margin-bottom: 30px;
+  }
+
+  .contact-modal-header h2 {
+    font-size: 28px;
+  }
+
+  .contact-modal-header span {
+    font-size: 12px;
+  }
+
+  .form-group {
+    margin-bottom: 18px;
+  }
+
+  .form-group input,
+  .form-group textarea {
+    padding: 13px 14px;
+  }
+
+}
+
+/* ==================================================
+   MODAL COMPRA
+================================================== */
+
+.purchase-modal-overlay {
+  position: fixed;
+  inset: 0;
+
+  background: rgba(20, 18, 16, 0.78);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  z-index: 3000;
+
+  overflow-y: auto;
+}
+
+
+.purchase-modal {
+  position: relative;
+
+  width: 720px;
+  max-width: 100%;
+
+  max-height: 92vh;
+  overflow-y: auto;
+
+  background: #fff;
+
+  padding: 48px;
+
+  border-radius: 5px;
+
+  box-shadow:
+    0 25px 70px rgba(0, 0, 0, 0.35);
+
+  animation: purchaseModalEntrada 0.3s ease;
+}
+
+
+@keyframes purchaseModalEntrada {
+
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+}
+
+
+/* CERRAR */
+
+.purchase-close {
+  position: absolute;
+
+  top: 15px;
+  right: 15px;
+
+  width: 36px;
+  height: 36px;
+
+  border: none;
+  border-radius: 50%;
+
+  background: #f3f1ee;
+
+  color: #333;
+
+  font-size: 25px;
+
+  cursor: pointer;
+
+  transition: 0.3s;
+}
+
+
+.purchase-close:hover {
+  background: #9b6b43;
+  color: #fff;
+}
+
+
+/* HEADER */
+
+.purchase-header {
+  text-align: center;
+
+  margin-bottom: 30px;
+}
+
+
+.purchase-header p {
+  margin: 0 0 10px;
+
+  font-family: Arial, sans-serif;
+
+  color: #9b6b43;
+
+  font-size: 11px;
+
+  letter-spacing: 3px;
+}
+
+
+.purchase-header h2 {
+  margin: 0 0 10px;
+
+  font-family: Georgia, "Times New Roman", serif;
+
+  font-size: 32px;
+
+  font-weight: normal;
+
+  color: #222;
+}
+
+
+.purchase-header span {
+  color: #777;
+
+  font-family: Arial, sans-serif;
+
+  font-size: 13px;
+}
+
+
+/* RESUMEN */
+
+.purchase-summary {
+  display: flex;
+
+  align-items: center;
+
+  gap: 18px;
+
+  padding: 15px;
+
+  margin-bottom: 28px;
+
+  background: #f6f3ef;
+
+  border: 1px solid #e8e2dc;
+
+  border-radius: 4px;
+}
+
+
+.purchase-summary img {
+  width: 85px;
+  height: 85px;
+
+  object-fit: cover;
+
+  border-radius: 3px;
+}
+
+
+.purchase-summary h3 {
+  margin: 0 0 8px;
+
+  font-family: Georgia, "Times New Roman", serif;
+
+  font-size: 18px;
+
+  font-weight: normal;
+}
+
+
+.purchase-summary strong {
+  font-family: Arial, sans-serif;
+
+  color: #9b6b43;
+
+  font-size: 15px;
+}
+
+
+/* FORM */
+
+.purchase-form {
+  width: 100%;
+}
+
+
+.purchase-form .form-row {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 20px;
+}
+
+
+.purchase-form .form-group {
+  margin-bottom: 19px;
+}
+
+
+.purchase-form label {
+  display: block;
+
+  margin-bottom: 8px;
+
+  font-family: Arial, sans-serif;
+
+  font-size: 12px;
+
+  font-weight: 600;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.7px;
+
+  color: #333;
+}
+
+
+.purchase-form input,
+.purchase-form textarea {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  padding: 13px 14px;
+
+  border: 1px solid #ddd6cf;
+
+  border-radius: 3px;
+
+  background: #faf9f7;
+
+  font-family: Arial, sans-serif;
+
+  font-size: 14px;
+
+  color: #222;
+
+  outline: none;
+
+  transition: 0.25s;
+}
+
+
+.purchase-form input:focus,
+.purchase-form textarea:focus {
+  background: #fff;
+
+  border-color: #9b6b43;
+
+  box-shadow:
+    0 0 0 3px rgba(155, 107, 67, 0.1);
+}
+
+
+.purchase-form textarea {
+  resize: vertical;
+
+  min-height: 100px;
+}
+
+
+/* BOTÓN */
+
+.purchase-button {
+  width: 100%;
+
+  padding: 15px;
+
+  margin-top: 5px;
+
+  border: none;
+
+  border-radius: 4px;
+
+  background: #222;
+
+  color: white;
+
+  font-family: Arial, sans-serif;
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  letter-spacing: 0.8px;
+
+  text-transform: uppercase;
+
+  cursor: pointer;
+
+  transition: 0.3s;
+}
+
+
+.purchase-button:hover {
+  background: #9b6b43;
+}
+
+
+.purchase-button:disabled {
+  opacity: 0.6;
+
+  cursor: not-allowed;
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 700px) {
+
+  .purchase-modal {
+    padding: 40px 25px 30px;
+  }
+
+  .purchase-form .form-row {
+    grid-template-columns: 1fr;
+
+    gap: 0;
+  }
+
+}
+
+
+@media (max-width: 500px) {
+
+  .purchase-modal {
+    padding: 40px 18px 25px;
+  }
+
+  .purchase-header h2 {
+    font-size: 27px;
+  }
+
+  .purchase-summary {
+    padding: 12px;
+  }
+
+  .purchase-summary img {
+    width: 70px;
+    height: 70px;
   }
 
 }
