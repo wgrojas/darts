@@ -1,6 +1,4 @@
 import { useState } from "react";
-import Swal from "sweetalert2";
-import emailjs from "@emailjs/browser";
 import "./App.css";
 
 // ======================================================
@@ -20,19 +18,6 @@ const WOMPI_PUBLIC_KEY =
 
 const WOMPI_INTEGRITY_SECRET =
   import.meta.env.VITE_WOMPI_INTEGRITY_SECRET;
-
-// EmailJS
-const EMAILJS_SERVICE_ID =
-  import.meta.env.VITE_EMAILJS_SERVICE_ID;
-
-const EMAILJS_TEMPLATE_ID =
-  import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
-
-const EMAILJS_PUBLIC_KEY =
-  import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
-
-const EMAIL_ADMIN =
-  import.meta.env.VITE_EMAIL_ADMIN;
 
 // ======================================================
 // TELEGRAM
@@ -117,56 +102,6 @@ const enviarTelegram = async (mensaje) => {
 };
 
 // ======================================================
-// ======================================================
-// EMAILJS
-// ======================================================
-
-const enviarCorreo = async (datosCorreo) => {
-  if (
-    !EMAILJS_SERVICE_ID ||
-    !EMAILJS_TEMPLATE_ID ||
-    !EMAILJS_PUBLIC_KEY
-  ) {
-    console.warn(
-      "EmailJS no está configurado. Revisa las variables VITE_EMAILJS_* en .env"
-    );
-    return false;
-  }
-
-  try {
-    await emailjs.send(
-      EMAILJS_SERVICE_ID,
-      EMAILJS_TEMPLATE_ID,
-      {
-        to_email: EMAIL_ADMIN || datosCorreo.customer_email || "",
-        customer_name: datosCorreo.customer_name || "",
-        customer_email: datosCorreo.customer_email || "",
-        customer_phone: datosCorreo.customer_phone || "",
-        customer_address: datosCorreo.customer_address || "",
-        customer_city: datosCorreo.customer_city || "",
-        painting: datosCorreo.painting || "",
-        amount: datosCorreo.amount || "",
-        reference: datosCorreo.reference || "",
-        transaction_id: datosCorreo.transaction_id || "",
-        payment_status: datosCorreo.payment_status || "",
-        payment_method: datosCorreo.payment_method || "",
-        observations: datosCorreo.observations || "",
-        subject: datosCorreo.subject || "",
-        message: datosCorreo.message || "",
-      },
-      EMAILJS_PUBLIC_KEY
-    );
-
-    console.log("✅ Correo enviado correctamente");
-    return true;
-  } catch (error) {
-    console.error("❌ Error enviando correo:", error);
-    return false;
-  }
-};
-
-// ======================================================
-
 // CARGAR WOMPI
 // ======================================================
 
@@ -556,13 +491,9 @@ function App() {
       );
 
     if (existe) {
-      Swal.fire({
-        icon: "info",
-        title: "Ya está en el carrito",
-        text: "Esta pintura ya está en el carrito.",
-        confirmButtonText: "Aceptar",
-        confirmButtonColor: "#9b6b43",
-      });
+      alert(
+        "Esta pintura ya está en el carrito."
+      );
       return;
     }
 
@@ -695,22 +626,9 @@ ${datos.mensaje}
           setEnviando(false);
 
           if (enviado) {
-            await enviarCorreo({
-              customer_name: datos.nombre,
-              customer_email: datos.email,
-              customer_phone: datos.telefono || "No indicado",
-              subject: datos.asunto || "Sin asunto",
-              message: datos.mensaje,
-              payment_status: "MENSAJE DE CONTACTO",
-            });
-
-            await Swal.fire({
-              icon: "success",
-              title: "Mensaje enviado",
-              text: "Hemos recibido tu mensaje correctamente.",
-              confirmButtonText: "Aceptar",
-              confirmButtonColor: "#9b6b43",
-            });
+            alert(
+              "Mensaje enviado correctamente."
+            );
 
             setDatos({
               nombre: "",
@@ -724,13 +642,9 @@ ${datos.mensaje}
               false
             );
           } else {
-            await Swal.fire({
-              icon: "error",
-              title: "No se pudo enviar",
-              text: "No fue posible enviar el mensaje a Telegram.",
-              confirmButtonText: "Aceptar",
-              confirmButtonColor: "#9b6b43",
-            });
+            alert(
+              "No fue posible enviar el mensaje a Telegram."
+            );
           }
         };
 
@@ -1119,10 +1033,8 @@ ${datos.mensaje}
               "🚀 Abriendo ventana de Wompi..."
             );
 
-            setCompraAbierta(false);
-
-            await new Promise((resolve) =>
-              setTimeout(resolve, 250)
+            alert(
+              "Wompi se está abriendo..."
             );
 
             checkout.open(
@@ -1154,13 +1066,9 @@ ${datos.mensaje}
                     "❌ Wompi no devolvió información de transacción."
                   );
 
-                  await Swal.fire({
-                    icon: "error",
-                    title: "Transacción no disponible",
-                    text: "No se recibió información de la transacción.",
-                    confirmButtonText: "Aceptar",
-                    confirmButtonColor: "#9b6b43",
-                  });
+                  alert(
+                    "No se recibió información de la transacción."
+                  );
 
                   setProcesandoPago(
                     false
@@ -1330,38 +1238,11 @@ PAGO APROBADO
                     );
                   }
 
-                  await enviarCorreo({
-                    customer_name: datos.nombre,
-                    customer_email: datos.email,
-                    customer_phone: datos.telefono,
-                    customer_address: datos.direccion,
-                    customer_city: datos.ciudad,
-                    painting: pintura.titulo,
-                    amount: formatearPrecio(totalCarrito),
-                    reference: referenciaWompi,
-                    transaction_id: transactionId,
-                    payment_status: "PAGO APROBADO",
-                    payment_method: metodoPago,
-                    observations:
-                      datos.observaciones ||
-                      "Sin observaciones",
-                    subject:
-                      `dartsGallery - Pago aprobado - ${referenciaWompi}`,
-                  });
-
-                  await Swal.fire({
-                    icon: "success",
-                    title: "¡Pago aprobado!",
-                    html: `
-                      <p>Tu compra fue procesada correctamente.</p>
-                      <p><strong>Referencia:</strong><br>${referenciaWompi}</p>
-                      <p><strong>Valor:</strong><br>${formatearPrecio(
-                        totalCarrito
-                      )}</p>
-                    `,
-                    confirmButtonText: "Aceptar",
-                    confirmButtonColor: "#9b6b43",
-                  });
+                  alert(
+                    `✅ PAGO APROBADO\n\nReferencia:\n${referenciaWompi}\n\nValor:\n${formatearPrecio(
+                      totalCarrito
+                    )}\n\n¡Gracias por tu compra!`
+                  );
 
                   console.log(
                     "🛒 Limpiando carrito..."
@@ -1458,32 +1339,9 @@ PAGO RECHAZADO
                     mensajeTelegram
                   );
 
-                  await enviarCorreo({
-                    customer_name: datos.nombre,
-                    customer_email: datos.email,
-                    customer_phone: datos.telefono,
-                    customer_address: datos.direccion,
-                    customer_city: datos.ciudad,
-                    painting: pintura.titulo,
-                    amount: formatearPrecio(totalCarrito),
-                    reference: referenciaWompi,
-                    transaction_id: transactionId,
-                    payment_status: "PAGO RECHAZADO",
-                    payment_method: metodoPago,
-                    observations:
-                      datos.observaciones ||
-                      "Sin observaciones",
-                    subject:
-                      `dartsGallery - Pago rechazado - ${referenciaWompi}`,
-                  });
-
-                  await Swal.fire({
-                    icon: "error",
-                    title: "Pago rechazado",
-                    text: "El pago no fue aprobado. Puedes intentar nuevamente.",
-                    confirmButtonText: "Aceptar",
-                    confirmButtonColor: "#9b6b43",
-                  });
+                  alert(
+                    `❌ PAGO RECHAZADO\n\nEstado: ${estado}\n\nPuedes intentar nuevamente.`
+                  );
 
                   setProcesandoPago(
                     false
@@ -1542,32 +1400,9 @@ ${estado}
                   mensajeTelegram
                 );
 
-                await enviarCorreo({
-                  customer_name: datos.nombre,
-                  customer_email: datos.email,
-                  customer_phone: datos.telefono,
-                  customer_address: datos.direccion,
-                  customer_city: datos.ciudad,
-                  painting: pintura.titulo,
-                  amount: formatearPrecio(totalCarrito),
-                  reference: referenciaWompi,
-                  transaction_id: transactionId,
-                  payment_status: estado,
-                  payment_method: metodoPago,
-                  observations:
-                    datos.observaciones ||
-                    "Sin observaciones",
-                  subject:
-                    `dartsGallery - Actualización de pago - ${referenciaWompi}`,
-                });
-
-                await Swal.fire({
-                  icon: "info",
-                  title: "Estado de la transacción",
-                  text: estado,
-                  confirmButtonText: "Aceptar",
-                  confirmButtonColor: "#9b6b43",
-                });
+                alert(
+                  `⚠️ Estado de la transacción:\n\n${estado}`
+                );
 
                 setProcesandoPago(
                   false
@@ -1642,31 +1477,12 @@ ${
               mensajeError
             );
 
-            await enviarCorreo({
-              customer_name: datos.nombre,
-              customer_email: datos.email,
-              customer_phone: datos.telefono,
-              customer_address: datos.direccion,
-              customer_city: datos.ciudad,
-              painting: pintura.titulo,
-              amount: formatearPrecio(totalCarrito),
-              payment_status: "ERROR AL INICIAR PAGO",
-              observations:
+            alert(
+              `❌ No fue posible iniciar el pago con Wompi.\n\nError:\n${
                 error?.message ||
-                "Error desconocido",
-              subject:
-                "dartsGallery - Error al iniciar pago Wompi",
-            });
-
-            await Swal.fire({
-              icon: "error",
-              title: "No fue posible iniciar el pago",
-              text:
-                error?.message ||
-                "Ocurrió un error al iniciar el pago con Wompi.",
-              confirmButtonText: "Aceptar",
-              confirmButtonColor: "#9b6b43",
-            });
+                "Error desconocido"
+              }\n\nRevisa la consola (F12) para más información.`
+            );
 
             setProcesandoPago(
               false
@@ -1693,13 +1509,9 @@ ${
             !datos.direccion ||
             !datos.ciudad
           ) {
-            await Swal.fire({
-              icon: "warning",
-              title: "Datos incompletos",
-              text: "Completa todos los campos obligatorios.",
-              confirmButtonText: "Aceptar",
-              confirmButtonColor: "#9b6b43",
-            });
+            alert(
+              "Completa todos los campos obligatorios."
+            );
 
             return;
           }
