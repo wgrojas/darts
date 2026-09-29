@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import emailjs from "@emailjs/browser";
 import "./App.css";
@@ -33,337 +33,6 @@ const EMAILJS_PUBLIC_KEY =
 
 const EMAIL_ADMIN =
   import.meta.env.VITE_EMAIL_ADMIN;
-
-// ======================================================
-// TELEGRAM
-// ======================================================
-
-const enviarTelegram = async (mensaje) => {
-  console.log("====================================");
-  console.log("📨 INICIANDO ENVÍO A TELEGRAM");
-  console.log("====================================");
-
-  try {
-    if (!TELEGRAM_BOT_TOKEN) {
-      console.error(
-        "❌ Falta VITE_TELEGRAM_BOT_TOKEN"
-      );
-      return false;
-    }
-
-    if (!TELEGRAM_CHAT_ID) {
-      console.error(
-        "❌ Falta VITE_TELEGRAM_CHAT_ID"
-      );
-      return false;
-    }
-
-    console.log(
-      "✓ Token de Telegram configurado"
-    );
-
-    console.log(
-      "✓ Chat ID configurado:",
-      TELEGRAM_CHAT_ID
-    );
-
-    const url =
-      `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-
-    console.log(
-      "📡 Enviando mensaje a Telegram..."
-    );
-
-    const respuesta = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        chat_id: TELEGRAM_CHAT_ID,
-        text: mensaje,
-      }),
-    });
-
-    const datos = await respuesta.json();
-
-    console.log(
-      "📥 Respuesta Telegram:",
-      datos
-    );
-
-    if (!datos.ok) {
-      console.error(
-        "❌ Telegram rechazó el mensaje:",
-        datos
-      );
-
-      return false;
-    }
-
-    console.log(
-      "✅ MENSAJE ENVIADO CORRECTAMENTE A TELEGRAM"
-    );
-
-    return true;
-  } catch (error) {
-    console.error(
-      "❌ ERROR CONECTANDO CON TELEGRAM:",
-      error
-    );
-
-    return false;
-  }
-};
-
-// ======================================================
-// ======================================================
-// EMAILJS
-// ======================================================
-
-const enviarCorreo = async (datosCorreo) => {
-  if (
-    !EMAILJS_SERVICE_ID ||
-    !EMAILJS_TEMPLATE_ID ||
-    !EMAILJS_PUBLIC_KEY
-  ) {
-    console.warn(
-      "EmailJS no está configurado. Revisa las variables VITE_EMAILJS_* en .env"
-    );
-    return false;
-  }
-
-  try {
-    await emailjs.send(
-      EMAILJS_SERVICE_ID,
-      EMAILJS_TEMPLATE_ID,
-      {
-        to_email: EMAIL_ADMIN || datosCorreo.customer_email || "",
-        customer_name: datosCorreo.customer_name || "",
-        customer_email: datosCorreo.customer_email || "",
-        customer_phone: datosCorreo.customer_phone || "",
-        customer_address: datosCorreo.customer_address || "",
-        customer_city: datosCorreo.customer_city || "",
-        painting: datosCorreo.painting || "",
-        amount: datosCorreo.amount || "",
-        reference: datosCorreo.reference || "",
-        transaction_id: datosCorreo.transaction_id || "",
-        payment_status: datosCorreo.payment_status || "",
-        payment_method: datosCorreo.payment_method || "",
-        observations: datosCorreo.observations || "",
-        subject: datosCorreo.subject || "",
-        message: datosCorreo.message || "",
-      },
-      EMAILJS_PUBLIC_KEY
-    );
-
-    console.log("✅ Correo enviado correctamente");
-    return true;
-  } catch (error) {
-    console.error("❌ Error enviando correo:", error);
-    return false;
-  }
-};
-
-// ======================================================
-
-// CARGAR WOMPI
-// ======================================================
-
-const cargarWompi = () => {
-  console.log(
-    "🔄 Verificando Widget de Wompi..."
-  );
-
-  return new Promise((resolve, reject) => {
-    if (window.WidgetCheckout) {
-      console.log(
-        "✓ WidgetCheckout ya está disponible"
-      );
-
-      resolve();
-      return;
-    }
-
-    const scriptExistente =
-      document.querySelector(
-        'script[src="https://checkout.wompi.co/widget.js"]'
-      );
-
-    if (scriptExistente) {
-      console.log(
-        "ℹ️ Script de Wompi ya existe. Esperando carga..."
-      );
-
-      scriptExistente.addEventListener(
-        "load",
-        () => {
-          console.log(
-            "✓ Script Wompi cargado"
-          );
-
-          resolve();
-        }
-      );
-
-      scriptExistente.addEventListener(
-        "error",
-        () => {
-          reject(
-            new Error(
-              "No fue posible cargar el script de Wompi."
-            )
-          );
-        }
-      );
-
-      return;
-    }
-
-    console.log(
-      "📥 Cargando script de Wompi..."
-    );
-
-    const script =
-      document.createElement("script");
-
-    script.src =
-      "https://checkout.wompi.co/widget.js";
-
-    script.async = true;
-
-    script.onload = () => {
-      console.log(
-        "✅ Script de Wompi cargado correctamente"
-      );
-
-      resolve();
-    };
-
-    script.onerror = () => {
-      console.error(
-        "❌ No fue posible cargar Wompi"
-      );
-
-      reject(
-        new Error(
-          "No fue posible cargar el Widget de Wompi."
-        )
-      );
-    };
-
-    document.body.appendChild(script);
-  });
-};
-
-// ======================================================
-// GENERAR FIRMA WOMPI
-// ======================================================
-
-const generarFirmaIntegridad = async (
-  referencia,
-  montoEnCentavos
-) => {
-  console.log(
-    "===================================="
-  );
-
-  console.log(
-    "🔐 GENERANDO FIRMA DE INTEGRIDAD"
-  );
-
-  console.log(
-    "===================================="
-  );
-
-  if (!WOMPI_INTEGRITY_SECRET) {
-    throw new Error(
-      "No está configurado VITE_WOMPI_INTEGRITY_SECRET."
-    );
-  }
-
-  const cadena =
-    `${referencia}${montoEnCentavos}COP${WOMPI_INTEGRITY_SECRET}`;
-
-  console.log(
-    "Referencia:",
-    referencia
-  );
-
-  console.log(
-    "Monto en centavos:",
-    montoEnCentavos
-  );
-
-  console.log(
-    "Moneda: COP"
-  );
-
-  console.log(
-    "✓ Cadena de integridad preparada"
-  );
-
-  const encodedText =
-    new TextEncoder().encode(
-      cadena
-    );
-
-  const hashBuffer =
-    await crypto.subtle.digest(
-      "SHA-256",
-      encodedText
-    );
-
-  const hashArray =
-    Array.from(
-      new Uint8Array(hashBuffer)
-    );
-
-  const firma =
-    hashArray
-      .map((b) =>
-        b
-          .toString(16)
-          .padStart(2, "0")
-      )
-      .join("");
-
-  console.log(
-    "✓ Firma SHA-256 generada"
-  );
-
-  console.log(
-    "Firma:",
-    firma
-  );
-
-  return firma;
-};
-
-// ======================================================
-// REFERENCIA ÚNICA
-// ======================================================
-
-const generarReferencia = () => {
-  const timestamp =
-    Date.now();
-
-  const aleatorio =
-    Math.random()
-      .toString(36)
-      .substring(2, 8)
-      .toUpperCase();
-
-  const referencia =
-    `DARTS-${timestamp}-${aleatorio}`;
-
-  console.log(
-    "🧾 Referencia generada:",
-    referencia
-  );
-
-  return referencia;
-};
 
 // ======================================================
 // PINTURAS
@@ -502,30 +171,240 @@ const pinturasIniciales = [
 // UTILIDADES
 // ======================================================
 
-function formatearPrecio(precio) {
+const formatearPrecio = (precio) => {
   return new Intl.NumberFormat("es-CO", {
     style: "currency",
     currency: "COP",
     maximumFractionDigits: 0,
   }).format(precio);
-}
+};
+
+const generarReferencia = () => {
+  return `DARTS-${Date.now()}-${Math.random()
+    .toString(36)
+    .substring(2, 8)
+    .toUpperCase()}`;
+};
 
 // ======================================================
-// APP
+// TELEGRAM
+// ======================================================
+
+const enviarTelegram = async (mensaje) => {
+  try {
+    if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
+      console.warn(
+        "Telegram no está configurado."
+      );
+      return false;
+    }
+
+    const url =
+      `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+
+    const respuesta = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT_ID,
+        text: mensaje,
+      }),
+    });
+
+    const resultado =
+      await respuesta.json();
+
+    return resultado.ok === true;
+  } catch (error) {
+    console.error(
+      "Error Telegram:",
+      error
+    );
+
+    return false;
+  }
+};
+
+// ======================================================
+// EMAILJS
+// ======================================================
+
+const enviarCorreo = async (datosCorreo) => {
+  if (
+    !EMAILJS_SERVICE_ID ||
+    !EMAILJS_TEMPLATE_ID ||
+    !EMAILJS_PUBLIC_KEY
+  ) {
+    console.warn(
+      "EmailJS no está configurado."
+    );
+
+    return false;
+  }
+
+  try {
+    await emailjs.send(
+      EMAILJS_SERVICE_ID,
+      EMAILJS_TEMPLATE_ID,
+      {
+        to_email:
+          EMAIL_ADMIN ||
+          datosCorreo.customer_email ||
+          "",
+
+        customer_name:
+          datosCorreo.customer_name ||
+          "",
+
+        customer_email:
+          datosCorreo.customer_email ||
+          "",
+
+        customer_phone:
+          datosCorreo.customer_phone ||
+          "",
+
+        customer_address:
+          datosCorreo.customer_address ||
+          "",
+
+        customer_city:
+          datosCorreo.customer_city ||
+          "",
+
+        customer_region:
+          datosCorreo.customer_region ||
+          "",
+
+        painting:
+          datosCorreo.painting ||
+          "",
+
+        amount:
+          datosCorreo.amount ||
+          "",
+
+        reference:
+          datosCorreo.reference ||
+          "",
+
+        transaction_id:
+          datosCorreo.transaction_id ||
+          "",
+
+        payment_status:
+          datosCorreo.payment_status ||
+          "",
+
+        payment_method:
+          datosCorreo.payment_method ||
+          "",
+
+        observations:
+          datosCorreo.observations ||
+          "",
+
+        subject:
+          datosCorreo.subject ||
+          "",
+
+        message:
+          datosCorreo.message ||
+          "",
+      },
+      EMAILJS_PUBLIC_KEY
+    );
+
+    return true;
+  } catch (error) {
+    console.error(
+      "Error EmailJS:",
+      error
+    );
+
+    return false;
+  }
+};
+
+// ======================================================
+// FIRMA WOMPI
+// ======================================================
+
+const generarFirmaIntegridad = async (
+  referencia,
+  montoEnCentavos
+) => {
+  if (!WOMPI_INTEGRITY_SECRET) {
+    throw new Error(
+      "No está configurado VITE_WOMPI_INTEGRITY_SECRET."
+    );
+  }
+
+  const cadena =
+    `${referencia}${montoEnCentavos}COP${WOMPI_INTEGRITY_SECRET}`;
+
+  const encodedText =
+    new TextEncoder().encode(
+      cadena
+    );
+
+  const hashBuffer =
+    await crypto.subtle.digest(
+      "SHA-256",
+      encodedText
+    );
+
+  const hashArray =
+    Array.from(
+      new Uint8Array(hashBuffer)
+    );
+
+  return hashArray
+    .map((byte) =>
+      byte
+        .toString(16)
+        .padStart(2, "0")
+    )
+    .join("");
+};
+
+// ======================================================
+// COMPONENTE PRINCIPAL
 // ======================================================
 
 function App() {
-  const [pinturas] = useState(
-    pinturasIniciales
-  );
+  const [pinturas] =
+    useState(pinturasIniciales);
 
   const [
     pinturaSeleccionada,
     setPinturaSeleccionada,
   ] = useState(null);
 
-  const [carrito, setCarrito] =
-    useState([]);
+  const [
+    carrito,
+    setCarrito,
+  ] = useState([]);
+
+  const [
+    favoritos,
+    setFavoritos,
+  ] = useState(() => {
+    try {
+      const guardados =
+        localStorage.getItem(
+          "dartsGalleryFavoritos"
+        );
+
+      return guardados
+        ? JSON.parse(guardados)
+        : [];
+    } catch {
+      return [];
+    }
+  });
 
   const [
     carritoAbierto,
@@ -542,6 +421,52 @@ function App() {
     setCompraAbierta,
   ] = useState(false);
 
+  const [
+    favoritosAbiertos,
+    setFavoritosAbiertos,
+  ] = useState(false);
+
+  // ====================================================
+  // GUARDAR FAVORITOS
+  // ====================================================
+
+  useEffect(() => {
+    localStorage.setItem(
+      "dartsGalleryFavoritos",
+      JSON.stringify(favoritos)
+    );
+  }, [favoritos]);
+
+  // ====================================================
+  // FAVORITOS
+  // ====================================================
+
+  const alternarFavorito = (
+    pintura
+  ) => {
+    setFavoritos((actuales) => {
+      const existe =
+        actuales.includes(
+          pintura.id
+        );
+
+      if (existe) {
+        return actuales.filter(
+          (id) =>
+            id !== pintura.id
+        );
+      }
+
+      return [
+        ...actuales,
+        pintura.id,
+      ];
+    });
+  };
+
+  const esFavorito = (id) =>
+    favoritos.includes(id);
+
   // ====================================================
   // CARRITO
   // ====================================================
@@ -552,17 +477,21 @@ function App() {
     const existe =
       carrito.some(
         (item) =>
-          item.id === pintura.id
+          item.id ===
+          pintura.id
       );
 
     if (existe) {
       Swal.fire({
         icon: "info",
-        title: "Ya está en el carrito",
-        text: "Esta pintura ya está en el carrito.",
-        confirmButtonText: "Aceptar",
-        confirmButtonColor: "#9b6b43",
+        title:
+          "Ya está en el carrito",
+        text:
+          "Esta pintura ya está en el carrito.",
+        confirmButtonColor:
+          "#9b6b43",
       });
+
       return;
     }
 
@@ -578,10 +507,6 @@ function App() {
     setCarritoAbierto(true);
   };
 
-  // ====================================================
-  // COMPRAR AHORA
-  // ====================================================
-
   const comprarAhora = (
     pintura
   ) => {
@@ -596,10 +521,6 @@ function App() {
     setCompraAbierta(true);
   };
 
-  // ====================================================
-  // ELIMINAR DEL CARRITO
-  // ====================================================
-
   const eliminarDelCarrito = (
     id
   ) => {
@@ -610,10 +531,6 @@ function App() {
       )
     );
   };
-
-  // ====================================================
-  // TOTAL
-  // ====================================================
 
   const totalCarrito =
     carrito.reduce(
@@ -645,24 +562,21 @@ function App() {
         setEnviando,
       ] = useState(false);
 
-      const manejarCambio =
-        (e) => {
-          setDatos({
-            ...datos,
-            [e.target.name]:
-              e.target.value,
-          });
-        };
+      const manejarCambio = (
+        e
+      ) => {
+        setDatos({
+          ...datos,
+          [e.target.name]:
+            e.target.value,
+        });
+      };
 
       const enviarFormulario =
         async (e) => {
           e.preventDefault();
 
           setEnviando(true);
-
-          console.log(
-            "📩 Enviando formulario de contacto..."
-          );
 
           const mensaje = `
 📩 NUEVO MENSAJE - dartsGallery
@@ -692,24 +606,36 @@ ${datos.mensaje}
               mensaje
             );
 
-          setEnviando(false);
-
           if (enviado) {
             await enviarCorreo({
-              customer_name: datos.nombre,
-              customer_email: datos.email,
-              customer_phone: datos.telefono || "No indicado",
-              subject: datos.asunto || "Sin asunto",
-              message: datos.mensaje,
-              payment_status: "MENSAJE DE CONTACTO",
+              customer_name:
+                datos.nombre,
+
+              customer_email:
+                datos.email,
+
+              customer_phone:
+                datos.telefono,
+
+              subject:
+                datos.asunto ||
+                "Sin asunto",
+
+              message:
+                datos.mensaje,
+
+              payment_status:
+                "MENSAJE DE CONTACTO",
             });
 
             await Swal.fire({
               icon: "success",
-              title: "Mensaje enviado",
-              text: "Hemos recibido tu mensaje correctamente.",
-              confirmButtonText: "Aceptar",
-              confirmButtonColor: "#9b6b43",
+              title:
+                "Mensaje enviado",
+              text:
+                "Hemos recibido tu mensaje correctamente.",
+              confirmButtonColor:
+                "#9b6b43",
             });
 
             setDatos({
@@ -726,12 +652,16 @@ ${datos.mensaje}
           } else {
             await Swal.fire({
               icon: "error",
-              title: "No se pudo enviar",
-              text: "No fue posible enviar el mensaje a Telegram.",
-              confirmButtonText: "Aceptar",
-              confirmButtonColor: "#9b6b43",
+              title:
+                "No se pudo enviar",
+              text:
+                "No fue posible enviar el mensaje.",
+              confirmButtonColor:
+                "#9b6b43",
             });
           }
+
+          setEnviando(false);
         };
 
       return (
@@ -850,7 +780,7 @@ ${datos.mensaje}
     };
 
   // ====================================================
-  // FORMULARIO DE COMPRA
+  // FORMULARIO COMPRA
   // ====================================================
 
   const FormularioCompra =
@@ -862,6 +792,8 @@ ${datos.mensaje}
           telefono: "",
           direccion: "",
           ciudad: "",
+          departamento:
+            "Santander",
           observaciones: "",
         });
 
@@ -877,131 +809,56 @@ ${datos.mensaje}
         return null;
       }
 
-      const manejarCambio =
-        (e) => {
-          setDatos({
-            ...datos,
-            [e.target.name]:
-              e.target.value,
-          });
-        };
+      const manejarCambio = (
+        e
+      ) => {
+        setDatos({
+          ...datos,
+          [e.target.name]:
+            e.target.value,
+        });
+      };
 
-      // ==================================================
-      // PROCESAR PAGO WOMPI
-      // ==================================================
+      // ================================================
+      // PROCESAR PAGO
+      // ================================================
 
       const procesarPago =
         async () => {
-          console.log(
-            "\n===================================="
-          );
-
-          console.log(
-            "💳 INICIANDO PROCESO DE PAGO WOMPI"
-          );
-
-          console.log(
-            "===================================="
-          );
-
           try {
-            // --------------------------------------------
-            // VALIDAR LLAVE PÚBLICA
-            // --------------------------------------------
-
-            console.log(
-              "🔎 Validando configuración..."
-            );
-
-            if (
-              !WOMPI_PUBLIC_KEY
-            ) {
+            if (!WOMPI_PUBLIC_KEY) {
               throw new Error(
-                "No está configurada VITE_WOMPI_PUBLIC_KEY en .env"
+                "No está configurada VITE_WOMPI_PUBLIC_KEY."
               );
             }
-
-            console.log(
-              "✓ Public Key encontrada"
-            );
-
-            // --------------------------------------------
-            // VALIDAR SECRETO
-            // --------------------------------------------
 
             if (
               !WOMPI_INTEGRITY_SECRET
             ) {
               throw new Error(
-                "No está configurado VITE_WOMPI_INTEGRITY_SECRET en .env"
+                "No está configurado VITE_WOMPI_INTEGRITY_SECRET."
               );
             }
-
-            console.log(
-              "✓ Integrity Secret encontrado"
-            );
-
-            // --------------------------------------------
-            // VALIDAR DATOS
-            // --------------------------------------------
 
             if (
               !datos.nombre ||
               !datos.email ||
               !datos.telefono ||
               !datos.direccion ||
-              !datos.ciudad
+              !datos.ciudad ||
+              !datos.departamento
             ) {
               throw new Error(
                 "Completa todos los datos obligatorios."
               );
             }
 
-            console.log(
-              "✓ Datos del cliente completos"
-            );
-
-            // --------------------------------------------
-            // ESTADO
-            // --------------------------------------------
-
             setProcesandoPago(
               true
             );
 
-            // --------------------------------------------
-            // CARGAR WOMPI
-            // --------------------------------------------
-
-            await cargarWompi();
-
-            if (
-              !window.WidgetCheckout
-            ) {
-              throw new Error(
-                "WidgetCheckout no está disponible."
-              );
-            }
-
-            console.log(
-              "✓ WidgetCheckout disponible"
-            );
-
-            // --------------------------------------------
-            // REFERENCIA
-            // --------------------------------------------
-
             const referencia =
               generarReferencia();
-
-            console.log(
-              "🧾 Referencia:",
-              referencia
-            );
-
-            // --------------------------------------------
-            // MONTO
-            // --------------------------------------------
 
             const montoEnCentavos =
               Math.round(
@@ -1010,609 +867,188 @@ ${datos.mensaje}
                 ) * 100
               );
 
-            console.log(
-              "💰 Total COP:",
-              totalCarrito
-            );
-
-            console.log(
-              "💰 Monto en centavos:",
-              montoEnCentavos
-            );
-
-            // --------------------------------------------
-            // GENERAR FIRMA
-            // --------------------------------------------
-
             const firma =
               await generarFirmaIntegridad(
                 referencia,
                 montoEnCentavos
               );
 
-            console.log(
-              "✓ Firma generada"
-            );
+            // ------------------------------------------
+            // ABRIR PESTAÑA WOMPI
+            // ------------------------------------------
 
-            // --------------------------------------------
-            // CONFIGURACIÓN WOMPI
-            // --------------------------------------------
+            const nombreVentana =
+              `wompi_${Date.now()}`;
 
-            const configuracionWompi =
-              {
-                currency: "COP",
-
-                amountInCents:
-                  montoEnCentavos,
-
-                reference:
-                  referencia,
-
-                publicKey:
-                  WOMPI_PUBLIC_KEY,
-
-                signature: {
-                  integrity:
-                    firma,
-                },
-              };
-
-            console.log(
-              "===================================="
-            );
-
-            console.log(
-              "⚙️ CONFIGURACIÓN WOMPI"
-            );
-
-            console.log(
-              "===================================="
-            );
-
-            console.log(
-              "Currency:",
-              configuracionWompi.currency
-            );
-
-            console.log(
-              "Amount:",
-              configuracionWompi.amountInCents
-            );
-
-            console.log(
-              "Reference:",
-              configuracionWompi.reference
-            );
-
-            console.log(
-              "Public Key:",
-              configuracionWompi.publicKey
-            );
-
-            console.log(
-              "Integrity:",
-              firma
-            );
-
-            // --------------------------------------------
-            // CREAR CHECKOUT
-            // --------------------------------------------
-
-            console.log(
-              "🔨 Creando WidgetCheckout..."
-            );
-
-            const checkout =
-              new window.WidgetCheckout(
-                configuracionWompi
+            const ventanaWompi =
+              window.open(
+                "about:blank",
+                nombreVentana
               );
 
-            console.log(
-              "✓ WidgetCheckout creado correctamente"
-            );
+            if (!ventanaWompi) {
+              throw new Error(
+                "El navegador bloqueó la ventana de Wompi."
+              );
+            }
 
-            // --------------------------------------------
-            // ABRIR CHECKOUT
-            // --------------------------------------------
+            ventanaWompi.document.title =
+              "Redirigiendo a Wompi...";
 
-            console.log(
-              "🚀 Abriendo ventana de Wompi..."
-            );
+            ventanaWompi.document.body.innerHTML = `
+              <div style="
+                font-family:Arial,sans-serif;
+                text-align:center;
+                padding:80px 20px;
+              ">
+                <div style="
+                  width:45px;
+                  height:45px;
+                  margin:0 auto 20px;
+                  border:4px solid #ddd;
+                  border-top:4px solid #9b6b43;
+                  border-radius:50%;
+                  animation:spin 1s linear infinite;
+                "></div>
 
-            setCompraAbierta(false);
+                <h2>
+                  Redirigiendo a Wompi...
+                </h2>
 
-            await new Promise((resolve) =>
-              setTimeout(resolve, 250)
-            );
+                <p>
+                  Estamos preparando tu pago.
+                </p>
 
-            checkout.open(
-              async (resultado) => {
-                console.log(
-                  "\n===================================="
-                );
-
-                console.log(
-                  "💳 RESULTADO DE WOMPI"
-                );
-
-                console.log(
-                  "===================================="
-                );
-
-                console.log(
-                  "Resultado completo:",
-                  resultado
-                );
-
-                const transaccion =
-                  resultado?.transaction;
-
-                if (
-                  !transaccion
-                ) {
-                  console.error(
-                    "❌ Wompi no devolvió información de transacción."
-                  );
-
-                  await Swal.fire({
-                    icon: "error",
-                    title: "Transacción no disponible",
-                    text: "No se recibió información de la transacción.",
-                    confirmButtonText: "Aceptar",
-                    confirmButtonColor: "#9b6b43",
-                  });
-
-                  setProcesandoPago(
-                    false
-                  );
-
-                  return;
-                }
-
-                // ------------------------------------------
-                // DATOS TRANSACCIÓN
-                // ------------------------------------------
-
-                const transactionId =
-                  transaccion.id ||
-                  "No disponible";
-
-                const referenciaWompi =
-                  transaccion.reference ||
-                  referencia;
-
-                const estado =
-                  transaccion.status ||
-                  "UNKNOWN";
-
-                const metodoPago =
-                  transaccion.payment_method_type ||
-                  transaccion.payment_method?.type ||
-                  "No disponible";
-
-                console.log(
-                  "🧾 Transaction ID:",
-                  transactionId
-                );
-
-                console.log(
-                  "🧾 Reference:",
-                  referenciaWompi
-                );
-
-                console.log(
-                  "📌 Status:",
-                  estado
-                );
-
-                console.log(
-                  "💳 Método de pago:",
-                  metodoPago
-                );
-
-                console.log(
-                  "📦 Transacción completa:",
-                  transaccion
-                );
-
-                // ==========================================
-                // PAGO APROBADO
-                // ==========================================
-
-                if (
-                  estado ===
-                  "APPROVED"
-                ) {
-                  console.log(
-                    "===================================="
-                  );
-
-                  console.log(
-                    "🟢🟢🟢 PAGO APROBADO 🟢🟢🟢"
-                  );
-
-                  console.log(
-                    "===================================="
-                  );
-
-                  const mensajeTelegram = `
-💰💰💰 PAGO APROBADO 💰💰💰
-
-🎨 dartsGallery
-
-━━━━━━━━━━━━━━━━━━
-
-🧾 TRANSACCIÓN
-
-ID:
-${transactionId}
-
-Referencia:
-${referenciaWompi}
-
-Método:
-${metodoPago}
-
-━━━━━━━━━━━━━━━━━━
-
-🎨 OBRA
-
-${pintura.titulo}
-
-ID pintura:
-${pintura.id}
-
-💰 VALOR:
-
-${formatearPrecio(
-                    totalCarrito
-                  )}
-
-━━━━━━━━━━━━━━━━━━
-
-👤 CLIENTE
-
-Nombre:
-${datos.nombre}
-
-Correo:
-${datos.email}
-
-Teléfono:
-${datos.telefono}
-
-━━━━━━━━━━━━━━━━━━
-
-📍 ENTREGA
-
-Dirección:
-${datos.direccion}
-
-Ciudad:
-${datos.ciudad}
-
-━━━━━━━━━━━━━━━━━━
-
-📝 OBSERVACIONES
-
-${
-  datos.observaciones ||
-  "Sin observaciones"
-}
-
-━━━━━━━━━━━━━━━━━━
-
-🟢 ESTADO:
-
-PAGO APROBADO
-
-✅ COMPRA REALIZADA
-`;
-
-                  console.log(
-                    "📨 Enviando alerta de pago aprobado a Telegram..."
-                  );
-
-                  const telegramEnviado =
-                    await enviarTelegram(
-                      mensajeTelegram
-                    );
-
-                  if (
-                    telegramEnviado
-                  ) {
-                    console.log(
-                      "✅ Alerta de pago enviada a Telegram"
-                    );
-                  } else {
-                    console.error(
-                      "❌ No fue posible enviar la alerta a Telegram"
-                    );
+                <style>
+                  @keyframes spin {
+                    to {
+                      transform:rotate(360deg);
+                    }
                   }
+                </style>
+              </div>
+            `;
 
-                  await enviarCorreo({
-                    customer_name: datos.nombre,
-                    customer_email: datos.email,
-                    customer_phone: datos.telefono,
-                    customer_address: datos.direccion,
-                    customer_city: datos.ciudad,
-                    painting: pintura.titulo,
-                    amount: formatearPrecio(totalCarrito),
-                    reference: referenciaWompi,
-                    transaction_id: transactionId,
-                    payment_status: "PAGO APROBADO",
-                    payment_method: metodoPago,
-                    observations:
-                      datos.observaciones ||
-                      "Sin observaciones",
-                    subject:
-                      `dartsGallery - Pago aprobado - ${referenciaWompi}`,
-                  });
+            // ------------------------------------------
+            // FORMULARIO WOMPI
+            // ------------------------------------------
 
-                  await Swal.fire({
-                    icon: "success",
-                    title: "¡Pago aprobado!",
-                    html: `
-                      <p>Tu compra fue procesada correctamente.</p>
-                      <p><strong>Referencia:</strong><br>${referenciaWompi}</p>
-                      <p><strong>Valor:</strong><br>${formatearPrecio(
-                        totalCarrito
-                      )}</p>
-                    `,
-                    confirmButtonText: "Aceptar",
-                    confirmButtonColor: "#9b6b43",
-                  });
+            const form =
+              document.createElement(
+                "form"
+              );
 
-                  console.log(
-                    "🛒 Limpiando carrito..."
+            form.method =
+              "GET";
+
+            form.action =
+              "https://checkout.wompi.co/p/";
+
+            form.target =
+              nombreVentana;
+
+            form.style.display =
+              "none";
+
+            // ------------------------------------------
+            // DATOS WOMPI
+            // ------------------------------------------
+
+            const campos = {
+              "public-key":
+                WOMPI_PUBLIC_KEY,
+
+              currency:
+                "COP",
+
+              "amount-in-cents":
+                String(
+                  montoEnCentavos
+                ),
+
+              reference:
+                referencia,
+
+              "signature:integrity":
+                firma,
+
+              // CLIENTE
+              "customer-data:email":
+                datos.email,
+
+              "customer-data:full-name":
+                datos.nombre,
+
+              "customer-data:phone-number":
+                datos.telefono,
+
+              // DIRECCIÓN
+              "shipping-address:address-line-1":
+                datos.direccion,
+
+              "shipping-address:country":
+                "CO",
+
+              "shipping-address:phone-number":
+                datos.telefono,
+
+              "shipping-address:city":
+                datos.ciudad,
+
+              // IMPORTANTE
+              // Esta era la que faltaba.
+              "shipping-address:region":
+                datos.departamento,
+            };
+
+            Object.entries(
+              campos
+            ).forEach(
+              ([nombre, valor]) => {
+                const input =
+                  document.createElement(
+                    "input"
                   );
 
-                  setCarrito([]);
+                input.type =
+                  "hidden";
 
-                  setCompraAbierta(
-                    false
-                  );
+                input.name =
+                  nombre;
 
-                  console.log(
-                    "✓ Compra finalizada"
-                  );
+                input.value =
+                  valor ?? "";
 
-                  setProcesandoPago(
-                    false
-                  );
-
-                  return;
-                }
-
-                // ==========================================
-                // PAGO RECHAZADO
-                // ==========================================
-
-                if (
-                  estado ===
-                  "DECLINED"
-                ) {
-                  console.log(
-                    "===================================="
-                  );
-
-                  console.log(
-                    "🔴 PAGO RECHAZADO"
-                  );
-
-                  console.log(
-                    "===================================="
-                  );
-
-                  const mensajeTelegram = `
-❌ PAGO RECHAZADO
-
-🎨 dartsGallery
-
-━━━━━━━━━━━━━━━━━━
-
-🧾 TRANSACCIÓN
-
-ID:
-${transactionId}
-
-Referencia:
-${referenciaWompi}
-
-Método:
-${metodoPago}
-
-━━━━━━━━━━━━━━━━━━
-
-🎨 OBRA
-
-${pintura.titulo}
-
-💰 VALOR:
-
-${formatearPrecio(
-                    totalCarrito
-                  )}
-
-━━━━━━━━━━━━━━━━━━
-
-👤 CLIENTE
-
-Nombre:
-${datos.nombre}
-
-Correo:
-${datos.email}
-
-Teléfono:
-${datos.telefono}
-
-━━━━━━━━━━━━━━━━━━
-
-🔴 ESTADO:
-
-PAGO RECHAZADO
-`;
-
-                  await enviarTelegram(
-                    mensajeTelegram
-                  );
-
-                  await enviarCorreo({
-                    customer_name: datos.nombre,
-                    customer_email: datos.email,
-                    customer_phone: datos.telefono,
-                    customer_address: datos.direccion,
-                    customer_city: datos.ciudad,
-                    painting: pintura.titulo,
-                    amount: formatearPrecio(totalCarrito),
-                    reference: referenciaWompi,
-                    transaction_id: transactionId,
-                    payment_status: "PAGO RECHAZADO",
-                    payment_method: metodoPago,
-                    observations:
-                      datos.observaciones ||
-                      "Sin observaciones",
-                    subject:
-                      `dartsGallery - Pago rechazado - ${referenciaWompi}`,
-                  });
-
-                  await Swal.fire({
-                    icon: "error",
-                    title: "Pago rechazado",
-                    text: "El pago no fue aprobado. Puedes intentar nuevamente.",
-                    confirmButtonText: "Aceptar",
-                    confirmButtonColor: "#9b6b43",
-                  });
-
-                  setProcesandoPago(
-                    false
-                  );
-
-                  return;
-                }
-
-                // ==========================================
-                // OTROS ESTADOS
-                // ==========================================
-
-                console.log(
-                  "⚠️ Estado de pago:",
-                  estado
-                );
-
-                const mensajeTelegram = `
-⚠️ ACTUALIZACIÓN DE PAGO
-
-🎨 dartsGallery
-
-━━━━━━━━━━━━━━━━━━
-
-ID:
-${transactionId}
-
-Referencia:
-${referenciaWompi}
-
-Método:
-${metodoPago}
-
-Obra:
-${pintura.titulo}
-
-Valor:
-${formatearPrecio(
-                  totalCarrito
-                )}
-
-Cliente:
-${datos.nombre}
-
-Correo:
-${datos.email}
-
-━━━━━━━━━━━━━━━━━━
-
-ESTADO:
-
-${estado}
-`;
-
-                await enviarTelegram(
-                  mensajeTelegram
-                );
-
-                await enviarCorreo({
-                  customer_name: datos.nombre,
-                  customer_email: datos.email,
-                  customer_phone: datos.telefono,
-                  customer_address: datos.direccion,
-                  customer_city: datos.ciudad,
-                  painting: pintura.titulo,
-                  amount: formatearPrecio(totalCarrito),
-                  reference: referenciaWompi,
-                  transaction_id: transactionId,
-                  payment_status: estado,
-                  payment_method: metodoPago,
-                  observations:
-                    datos.observaciones ||
-                    "Sin observaciones",
-                  subject:
-                    `dartsGallery - Actualización de pago - ${referenciaWompi}`,
-                });
-
-                await Swal.fire({
-                  icon: "info",
-                  title: "Estado de la transacción",
-                  text: estado,
-                  confirmButtonText: "Aceptar",
-                  confirmButtonColor: "#9b6b43",
-                });
-
-                setProcesandoPago(
-                  false
+                form.appendChild(
+                  input
                 );
               }
             );
 
+            document.body.appendChild(
+              form
+            );
+
+            setCompraAbierta(
+              false
+            );
+
+            form.submit();
+
+            setProcesandoPago(
+              false
+            );
+
           } catch (error) {
             console.error(
-              "\n===================================="
-            );
-
-            console.error(
-              "❌ ERROR WOMPI"
-            );
-
-            console.error(
-              "===================================="
-            );
-
-            console.error(
-              "Error completo:",
+              "Error Wompi:",
               error
             );
 
-            console.error(
-              "Mensaje:",
-              error?.message
-            );
-
-            console.error(
-              "Stack:",
-              error?.stack
-            );
-
-            // --------------------------------------------
-            // ALERTA TELEGRAM DE ERROR
-            // --------------------------------------------
-
-            const mensajeError = `
+            await enviarTelegram(`
 🚨 ERROR EN PAGO WOMPI
 
 🎨 dartsGallery
-
-━━━━━━━━━━━━━━━━━━
 
 Cliente:
 ${datos.nombre}
@@ -1620,52 +1056,66 @@ ${datos.nombre}
 Correo:
 ${datos.email}
 
+Teléfono:
+${datos.telefono}
+
 Obra:
 ${pintura.titulo}
 
 Valor:
 ${formatearPrecio(
-              totalCarrito
-            )}
+  totalCarrito
+)}
 
-━━━━━━━━━━━━━━━━━━
-
-❌ ERROR
-
-${
-  error?.message ||
-  "Error desconocido"
-}
-`;
-
-            await enviarTelegram(
-              mensajeError
-            );
+Error:
+${error.message}
+`);
 
             await enviarCorreo({
-              customer_name: datos.nombre,
-              customer_email: datos.email,
-              customer_phone: datos.telefono,
-              customer_address: datos.direccion,
-              customer_city: datos.ciudad,
-              painting: pintura.titulo,
-              amount: formatearPrecio(totalCarrito),
-              payment_status: "ERROR AL INICIAR PAGO",
+              customer_name:
+                datos.nombre,
+
+              customer_email:
+                datos.email,
+
+              customer_phone:
+                datos.telefono,
+
+              customer_address:
+                datos.direccion,
+
+              customer_city:
+                datos.ciudad,
+
+              customer_region:
+                datos.departamento,
+
+              painting:
+                pintura.titulo,
+
+              amount:
+                formatearPrecio(
+                  totalCarrito
+                ),
+
+              payment_status:
+                "ERROR",
+
               observations:
-                error?.message ||
-                "Error desconocido",
+                error.message,
+
               subject:
-                "dartsGallery - Error al iniciar pago Wompi",
+                "dartsGallery - Error Wompi",
             });
 
             await Swal.fire({
               icon: "error",
-              title: "No fue posible iniciar el pago",
+              title:
+                "No fue posible iniciar el pago",
               text:
-                error?.message ||
-                "Ocurrió un error al iniciar el pago con Wompi.",
-              confirmButtonText: "Aceptar",
-              confirmButtonColor: "#9b6b43",
+                error.message,
+              confirmButtonColor:
+                "#9b6b43",
             });
 
             setProcesandoPago(
@@ -1674,31 +1124,26 @@ ${
           }
         };
 
-      // ==================================================
-      // ENVIAR PEDIDO
-      // ==================================================
-
       const enviarPedido =
         async (e) => {
           e.preventDefault();
-
-          console.log(
-            "🛒 Botón Pagar con Wompi presionado"
-          );
 
           if (
             !datos.nombre ||
             !datos.email ||
             !datos.telefono ||
             !datos.direccion ||
-            !datos.ciudad
+            !datos.ciudad ||
+            !datos.departamento
           ) {
             await Swal.fire({
               icon: "warning",
-              title: "Datos incompletos",
-              text: "Completa todos los campos obligatorios.",
-              confirmButtonText: "Aceptar",
-              confirmButtonColor: "#9b6b43",
+              title:
+                "Datos incompletos",
+              text:
+                "Completa todos los campos obligatorios.",
+              confirmButtonColor:
+                "#9b6b43",
             });
 
             return;
@@ -1710,12 +1155,15 @@ ${
       return (
         <div
           className="purchase-modal-overlay"
-          onClick={() =>
-            !procesandoPago &&
-            setCompraAbierta(
-              false
-            )
-          }
+          onClick={() => {
+            if (
+              !procesandoPago
+            ) {
+              setCompraAbierta(
+                false
+              );
+            }
+          }}
         >
           <div
             className="purchase-modal"
@@ -1866,6 +1314,25 @@ ${
 
               <div className="form-group">
                 <label>
+                  Departamento / región
+                </label>
+
+                <input
+                  type="text"
+                  name="departamento"
+                  value={
+                    datos.departamento
+                  }
+                  onChange={
+                    manejarCambio
+                  }
+                  placeholder="Santander"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label>
                   Dirección de entrega
                 </label>
 
@@ -1919,18 +1386,31 @@ ${
     };
 
   // ====================================================
+  // PINTURAS FAVORITAS
+  // ====================================================
+
+  const pinturasFavoritas =
+    pinturas.filter(
+      (pintura) =>
+        favoritos.includes(
+          pintura.id
+        )
+    );
+
+  // ====================================================
   // INTERFAZ
   // ====================================================
 
   return (
     <div className="app">
 
-      {/* HEADER */}
+      {/* ================================================
+          HEADER
+      ================================================= */}
 
       <header className="header">
 
         <div className="logo">
-
           <h1>
             dartsGallery
           </h1>
@@ -1938,11 +1418,9 @@ ${
           <span>
             Galería de Arte
           </span>
-
         </div>
 
         <nav>
-
           <a href="#inicio">
             Inicio
           </a>
@@ -1967,30 +1445,56 @@ ${
           >
             Contacto
           </a>
-
         </nav>
 
-        <button
-          className="cart"
-          onClick={() =>
-            setCarritoAbierto(
-              true
-            )
-          }
-        >
-          🛒 Carrito (
-          {carrito.length})
-        </button>
+        <div className="header-actions">
+
+          <button
+            className="favorites-header"
+            onClick={() =>
+              setFavoritosAbiertos(
+                true
+              )
+            }
+          >
+            <span>
+              ♥
+            </span>
+
+            Favoritos
+
+            {favoritos.length >
+              0 && (
+              <b>
+                {favoritos.length}
+              </b>
+            )}
+          </button>
+
+          <button
+            className="cart"
+            onClick={() =>
+              setCarritoAbierto(
+                true
+              )
+            }
+          >
+            🛒 Carrito (
+            {carrito.length})
+          </button>
+
+        </div>
 
       </header>
 
-      {/* HERO */}
+      {/* ================================================
+          HERO
+      ================================================= */}
 
       <section
         id="inicio"
         className="hero"
       >
-
         <div className="hero-content">
 
           <p className="subtitle">
@@ -2018,10 +1522,11 @@ ${
           </a>
 
         </div>
-
       </section>
 
-      {/* GALERÍA */}
+      {/* ================================================
+          GALERÍA
+      ================================================= */}
 
       <section
         id="galeria"
@@ -2039,9 +1544,8 @@ ${
           </h2>
 
           <span>
-            Descubre piezas únicas
-            para darle personalidad
-            a tus espacios.
+            Descubre piezas únicas para
+            darle personalidad a tus espacios.
           </span>
 
         </div>
@@ -2050,7 +1554,6 @@ ${
 
           {pinturas.map(
             (pintura) => (
-
               <article
                 className="painting-card"
                 key={
@@ -2058,9 +1561,17 @@ ${
                 }
               >
 
-                <div className="image-container">
+                <div
+                  className="image-container"
+                  onClick={() =>
+                    setPinturaSeleccionada(
+                      pintura
+                    )
+                  }
+                >
 
                   <img
+                    className="painting-motion"
                     src={
                       pintura.imagen
                     }
@@ -2069,12 +1580,41 @@ ${
                     }
                   />
 
+                  <div className="image-overlay">
+                    <span>
+                      Ver pintura
+                    </span>
+                  </div>
+
                   <button
-                    className="favorite"
+                    className={`favorite ${
+                      esFavorito(
+                        pintura.id
+                      )
+                        ? "is-favorite"
+                        : ""
+                    }`}
                     type="button"
-                    aria-label="Agregar a favoritos"
+                    aria-label={
+                      esFavorito(
+                        pintura.id
+                      )
+                        ? "Quitar de favoritos"
+                        : "Agregar a favoritos"
+                    }
+                    onClick={(e) => {
+                      e.stopPropagation();
+
+                      alternarFavorito(
+                        pintura
+                      );
+                    }}
                   >
-                    ♡
+                    {esFavorito(
+                      pintura.id
+                    )
+                      ? "♥"
+                      : "♡"}
                   </button>
 
                 </div>
@@ -2107,7 +1647,6 @@ ${
                 </div>
 
               </article>
-
             )
           )}
 
@@ -2115,7 +1654,9 @@ ${
 
       </section>
 
-      {/* NOSOTROS */}
+      {/* ================================================
+          NOSOTROS
+      ================================================= */}
 
       <section
         id="nosotros"
@@ -2141,7 +1682,9 @@ ${
 
       </section>
 
-      {/* FOOTER */}
+      {/* ================================================
+          FOOTER
+      ================================================= */}
 
       <footer id="contacto">
 
@@ -2154,18 +1697,28 @@ ${
           originales
         </p>
 
+        <button
+          className="footer-contact"
+          onClick={() =>
+            setContactoAbierto(
+              true
+            )
+          }
+        >
+          Contáctanos
+        </button>
+
         <p>
           © 2026 dartsGallery
         </p>
 
       </footer>
 
-      {/* =================================================
-          MODAL PINTURA
+      {/* ================================================
+          MODAL VER PINTURA
       ================================================= */}
 
       {pinturaSeleccionada && (
-
         <div
           className="modal-overlay"
           onClick={() =>
@@ -2196,6 +1749,7 @@ ${
             <div className="modal-image-container">
 
               <img
+                className="modal-painting-motion"
                 src={
                   pinturaSeleccionada.imagen
                 }
@@ -2234,6 +1788,31 @@ ${
                 Precio en pesos colombianos
               </p>
 
+              <div className="modal-favorite-row">
+
+                <button
+                  className={`modal-favorite ${
+                    esFavorito(
+                      pinturaSeleccionada.id
+                    )
+                      ? "is-favorite"
+                      : ""
+                  }`}
+                  onClick={() =>
+                    alternarFavorito(
+                      pinturaSeleccionada
+                    )
+                  }
+                >
+                  {esFavorito(
+                    pinturaSeleccionada.id
+                  )
+                    ? "♥ En favoritos"
+                    : "♡ Agregar a favoritos"}
+                </button>
+
+              </div>
+
               <div className="purchase-buttons">
 
                 <button
@@ -2265,15 +1844,13 @@ ${
           </div>
 
         </div>
-
       )}
 
-      {/* =================================================
+      {/* ================================================
           CARRITO
       ================================================= */}
 
       {carritoAbierto && (
-
         <div
           className="cart-overlay"
           onClick={() =>
@@ -2311,7 +1888,6 @@ ${
 
             {carrito.length ===
             0 ? (
-
               <div className="cart-empty">
 
                 <div className="cart-icon">
@@ -2328,16 +1904,12 @@ ${
                 </p>
 
               </div>
-
             ) : (
-
               <>
-
                 <div className="cart-items">
 
                   {carrito.map(
                     (pintura) => (
-
                       <div
                         className="cart-item"
                         key={
@@ -2382,7 +1954,6 @@ ${
                         </div>
 
                       </div>
-
                     )
                   )}
 
@@ -2420,23 +1991,163 @@ ${
                   </button>
 
                 </div>
-
               </>
-
             )}
 
           </aside>
 
         </div>
-
       )}
 
-      {/* =================================================
+      {/* ================================================
+          FAVORITOS
+      ================================================= */}
+
+      {favoritosAbiertos && (
+        <div
+          className="favorites-overlay"
+          onClick={() =>
+            setFavoritosAbiertos(
+              false
+            )
+          }
+        >
+
+          <div
+            className="favorites-modal"
+            onClick={(e) =>
+              e.stopPropagation()
+            }
+          >
+
+            <button
+              className="close-modal"
+              onClick={() =>
+                setFavoritosAbiertos(
+                  false
+                )
+              }
+            >
+              ×
+            </button>
+
+            <div className="favorites-header">
+
+              <p>
+                MI COLECCIÓN
+              </p>
+
+              <h2>
+                Favoritos ❤️
+              </h2>
+
+              <span>
+                {pinturasFavoritas.length ===
+                0
+                  ? "Todavía no tienes pinturas favoritas."
+                  : `Tienes ${pinturasFavoritas.length} pintura${
+                      pinturasFavoritas.length !==
+                      1
+                        ? "s"
+                        : ""
+                    } favorita${
+                      pinturasFavoritas.length !==
+                      1
+                        ? "s"
+                        : ""
+                    }.`}
+              </span>
+
+            </div>
+
+            {pinturasFavoritas.length ===
+            0 ? (
+              <div className="favorites-empty">
+                <div>
+                  ♡
+                </div>
+
+                <p>
+                  Pulsa el corazón de
+                  una pintura para
+                  guardarla aquí.
+                </p>
+              </div>
+            ) : (
+              <div className="favorites-grid">
+
+                {pinturasFavoritas.map(
+                  (pintura) => (
+                    <article
+                      className="favorite-card"
+                      key={
+                        pintura.id
+                      }
+                    >
+
+                      <div
+                        className="favorite-card-image"
+                        onClick={() => {
+                          setFavoritosAbiertos(
+                            false
+                          );
+
+                          setPinturaSeleccionada(
+                            pintura
+                          );
+                        }}
+                      >
+
+                        <img
+                          src={
+                            pintura.imagen
+                          }
+                          alt={
+                            pintura.titulo
+                          }
+                        />
+
+                      </div>
+
+                      <h3>
+                        {
+                          pintura.titulo
+                        }
+                      </h3>
+
+                      <p>
+                        {formatearPrecio(
+                          pintura.precio
+                        )}
+                      </p>
+
+                      <button
+                        onClick={() =>
+                          alternarFavorito(
+                            pintura
+                          )
+                        }
+                      >
+                        ♥ Quitar
+                      </button>
+
+                    </article>
+                  )
+                )}
+
+              </div>
+            )}
+
+          </div>
+
+        </div>
+      )}
+
+      {/* ================================================
           CONTACTO
       ================================================= */}
 
       {contactoAbierto && (
-
         <div
           className="contact-modal-overlay"
           onClick={() =>
@@ -2471,14 +2182,12 @@ ${
               </p>
 
               <h2>
-                Hablemos de arte
+                Hablemos
               </h2>
 
               <span>
                 ¿Tienes alguna pregunta
                 sobre nuestras obras?
-                Estamos aquí para
-                ayudarte.
               </span>
 
             </div>
@@ -2488,16 +2197,16 @@ ${
           </div>
 
         </div>
-
       )}
 
-      {/* =================================================
+      {/* ================================================
           COMPRA
       ================================================= */}
 
-      {compraAbierta && (
-        <FormularioCompra />
-      )}
+      {compraAbierta &&
+        carrito.length > 0 && (
+          <FormularioCompra />
+        )}
 
     </div>
   );
