@@ -87,6 +87,8 @@ img {
 
 .logo {
   min-width: 155px;
+
+  animation: logoEntrada 1.2s ease-out both;
 }
 
 .logo h1 {
@@ -132,7 +134,15 @@ img {
   padding: 0;
 }
 
-/* FAVORITOS HEADER */
+.header-actions > button {
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.header-actions > button:hover {
+  transform: translateY(-2px);
+}
 
 .favorites-header {
   height: 40px;
@@ -148,16 +158,15 @@ img {
   color: var(--text);
   font-size: 13px;
   white-space: nowrap;
+
   transition:
-    transform 0.2s ease,
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
 .favorites-header:hover {
-  border-color: #d5c4b4;
-  box-shadow: 0 5px 15px rgba(45, 35, 27, 0.08);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 18px rgba(45, 35, 27, 0.1);
 }
 
 .favorites-header span {
@@ -178,8 +187,6 @@ img {
   font-size: 11px;
 }
 
-/* CARRITO */
-
 .cart {
   height: 40px;
   display: flex;
@@ -193,11 +200,17 @@ img {
   background: transparent;
   color: var(--accent-dark);
   white-space: nowrap;
+
+  transition:
+    transform 0.25s ease,
+    background 0.25s ease,
+    color 0.25s ease;
 }
 
 .cart:hover {
   background: var(--accent);
   color: #fff;
+  transform: translateY(-2px);
 }
 
 /* =========================
@@ -209,6 +222,8 @@ img {
   padding: 90px 6%;
   display: flex;
   align-items: center;
+  overflow: hidden;
+
   background:
     linear-gradient(
       90deg,
@@ -216,6 +231,14 @@ img {
       rgba(28, 23, 19, 0.18)
     ),
     url("/images/1.jpeg") center/cover no-repeat;
+
+  /*
+    Movimiento suave de la imagen
+    del encabezado.
+  */
+  animation: heroImagen 14s ease-in-out infinite alternate;
+
+  will-change: background-position, background-size;
 }
 
 .hero-content {
@@ -260,10 +283,19 @@ img {
   color: var(--text);
   text-decoration: none;
   font-weight: 700;
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.hero-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
 }
 
 /* =========================
-   GALERÍA
+   GALLERY
 ========================= */
 
 .gallery-section {
@@ -310,6 +342,7 @@ img {
   border: 1px solid var(--border);
   border-radius: 18px;
   box-shadow: 0 8px 30px rgba(45, 35, 27, 0.07);
+
   transition:
     transform 0.25s ease,
     box-shadow 0.25s ease;
@@ -325,6 +358,7 @@ img {
   aspect-ratio: 4 / 5;
   overflow: hidden;
   background: #eee;
+
   cursor: zoom-in;
 }
 
@@ -332,34 +366,77 @@ img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.4s ease;
 }
 
-/* ANIMACIÓN DE LAS PINTURAS */
+
+/* =====================================================
+   MOVIMIENTO DE TODAS LAS PINTURAS
+===================================================== */
 
 .painting-motion {
-  animation:
-    pinturaRespira 6s ease-in-out infinite alternate;
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
+
   transform-origin: center center;
+
+  /*
+    Animación continua y muy suave.
+  */
+  animation:
+    pinturaRespira
+    7s
+    ease-in-out
+    infinite
+    alternate;
+
+  will-change: transform;
 }
+
+
+/*
+   Cuando el usuario pasa el mouse,
+   detenemos el movimiento y hacemos
+   un pequeño acercamiento.
+*/
 
 .painting-card:hover .painting-motion {
   animation-play-state: paused;
-  transform: scale(1.075) rotate(0.35deg);
-  filter: saturate(1.05) contrast(1.02);
+
+  transform:
+    scale(1.075)
+    rotate(0.35deg);
+
+  filter:
+    saturate(1.05)
+    contrast(1.02);
 }
+
+
+/* =========================
+   FAVORITO
+========================= */
 
 .favorite {
   position: absolute;
+  z-index: 5;
+
   top: 12px;
   right: 12px;
+
   width: 40px;
   height: 40px;
+
   border: 0;
   border-radius: 50%;
+
   background: rgba(255, 255, 255, 0.92);
+
   font-size: 23px;
-  z-index: 3;
+  line-height: 1;
 
   transition:
     transform 0.25s ease,
@@ -369,8 +446,10 @@ img {
 }
 
 .favorite:hover {
-  transform: scale(1.08);
-  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.12);
+  transform: scale(1.12);
+
+  box-shadow:
+    0 6px 18px rgba(0, 0, 0, 0.15);
 }
 
 .favorite:active {
@@ -379,9 +458,21 @@ img {
 
 .favorite.is-favorite {
   color: #b42318;
-  background: rgba(255, 255, 255, 0.96);
+
+  background:
+    rgba(255, 255, 255, 0.96);
+
   transform: scale(1.08);
 }
+
+.favorite.is-favorite:hover {
+  transform: scale(1.16);
+}
+
+
+/* =========================
+   INFO PINTURA
+========================= */
 
 .painting-info {
   padding: 18px;
@@ -426,357 +517,6 @@ img {
 }
 
 /* =========================
-   MODAL DE FAVORITOS
-========================= */
-
-.favorites-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 2100;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 20px;
-
-  background: rgba(15, 12, 10, 0.72);
-
-  overflow-y: auto;
-
-  animation: favoritosOverlay 0.25s ease;
-}
-
-.favorites-modal {
-  position: relative;
-
-  width: min(1050px, 100%);
-  max-height: calc(100vh - 40px);
-
-  overflow-y: auto;
-
-  padding: 30px;
-
-  border-radius: 22px;
-
-  background: #fff;
-
-  box-shadow:
-    0 30px 90px rgba(0, 0, 0, 0.32);
-
-  animation: favoritosEntrada 0.3s ease;
-}
-
-.favorites-modal-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-
-  gap: 20px;
-
-  padding-bottom: 24px;
-
-  border-bottom: 1px solid var(--border);
-}
-
-.favorites-modal-header p {
-  margin: 0 0 8px;
-
-  color: var(--accent);
-
-  font-size: 12px;
-
-  letter-spacing: 2px;
-
-  font-weight: 700;
-}
-
-.favorites-modal-header h2 {
-  margin: 0 0 8px;
-
-  font-family: Georgia, "Times New Roman", serif;
-
-  font-size: 38px;
-
-  color: var(--text);
-}
-
-.favorites-modal-header span {
-  color: var(--muted);
-
-  font-size: 14px;
-}
-
-.favorites-close {
-  flex-shrink: 0;
-
-  width: 42px;
-  height: 42px;
-
-  border: 0;
-  border-radius: 50%;
-
-  background: #f5f1ec;
-
-  color: var(--text);
-
-  font-size: 27px;
-
-  line-height: 1;
-
-  transition:
-    transform 0.2s ease,
-    background 0.2s ease;
-}
-
-.favorites-close:hover {
-  background: #e9ded2;
-
-  transform: rotate(5deg) scale(1.05);
-}
-
-/* GRID FAVORITOS */
-
-.favorites-grid {
-  display: grid;
-
-  grid-template-columns:
-    repeat(3, minmax(0, 1fr));
-
-  gap: 22px;
-
-  padding-top: 25px;
-}
-
-.favorite-card {
-  overflow: hidden;
-
-  background: var(--surface);
-
-  border: 1px solid var(--border);
-
-  border-radius: 16px;
-
-  box-shadow:
-    0 8px 25px rgba(45, 35, 27, 0.07);
-
-  transition:
-    transform 0.25s ease,
-    box-shadow 0.25s ease;
-}
-
-.favorite-card:hover {
-  transform: translateY(-4px);
-
-  box-shadow:
-    0 18px 40px rgba(45, 35, 27, 0.13);
-}
-
-.favorite-card-image {
-  position: relative;
-
-  aspect-ratio: 4 / 5;
-
-  overflow: hidden;
-
-  background: #eee;
-
-  cursor: zoom-in;
-}
-
-.favorite-card-image img {
-  width: 100%;
-  height: 100%;
-
-  object-fit: cover;
-
-  animation:
-    favoritoRespira 6s ease-in-out infinite alternate;
-
-  transform-origin: center center;
-
-  transition: transform 0.4s ease;
-}
-
-.favorite-card:hover .favorite-card-image img {
-  animation-play-state: paused;
-
-  transform:
-    scale(1.055)
-    rotate(0.25deg);
-}
-
-.favorite-card-info {
-  padding: 16px;
-}
-
-.favorite-card-info h3 {
-  margin: 0 0 8px;
-
-  font-family: Georgia, "Times New Roman", serif;
-
-  font-size: 19px;
-}
-
-.favorite-card-info p {
-  margin: 0 0 14px;
-
-  color: var(--accent-dark);
-
-  font-size: 17px;
-
-  font-weight: 800;
-}
-
-.favorite-card-info button {
-  width: 100%;
-
-  min-height: 40px;
-
-  border: 1px solid var(--border);
-
-  border-radius: 9px;
-
-  background: #fff;
-
-  color: #9b3838;
-
-  font-size: 13px;
-
-  font-weight: 700;
-
-  transition:
-    background 0.2s ease,
-    border-color 0.2s ease;
-}
-
-.favorite-card-info button:hover {
-  background: #fff5f5;
-
-  border-color: #d9aaaa;
-}
-
-/* FAVORITOS VACÍOS */
-
-.favorites-empty {
-  min-height: 300px;
-
-  display: flex;
-
-  flex-direction: column;
-
-  align-items: center;
-
-  justify-content: center;
-
-  text-align: center;
-
-  color: var(--muted);
-}
-
-.favorites-empty > div {
-  width: 78px;
-  height: 78px;
-
-  display: flex;
-
-  align-items: center;
-  justify-content: center;
-
-  margin-bottom: 18px;
-
-  border-radius: 50%;
-
-  background: #f6f1eb;
-
-  color: #b54848;
-
-  font-size: 42px;
-}
-
-.favorites-empty p {
-  max-width: 360px;
-
-  margin: 0;
-
-  line-height: 1.7;
-}
-
-/* =========================
-   ANIMACIONES FAVORITOS
-========================= */
-
-@keyframes favoritosOverlay {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes favoritosEntrada {
-  from {
-    opacity: 0;
-    transform: translateY(20px) scale(0.98);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes pinturaRespira {
-  0% {
-    transform:
-      scale(1.015)
-      translate3d(-0.3%, -0.2%, 0);
-  }
-
-  50% {
-    transform:
-      scale(1.035)
-      translate3d(0.2%, 0.15%, 0);
-  }
-
-  100% {
-    transform:
-      scale(1.055)
-      translate3d(0.35%, -0.15%, 0);
-  }
-}
-
-@keyframes favoritoRespira {
-  0% {
-    transform:
-      scale(1.01)
-      translate3d(-0.2%, 0, 0);
-  }
-
-  100% {
-    transform:
-      scale(1.04)
-      translate3d(0.25%, -0.15%, 0);
-  }
-}
-
-@keyframes pinturaModal {
-  0% {
-    transform:
-      scale(1.01)
-      translate3d(-0.25%, 0, 0);
-  }
-
-  100% {
-    transform:
-      scale(1.045)
-      translate3d(0.25%, -0.15%, 0);
-  }
-}
-
-/* =========================
    ABOUT / FOOTER
 ========================= */
 
@@ -818,7 +558,7 @@ footer p {
 }
 
 /* =========================
-   MODALES GENERALES
+   GENERAL MODALS
 ========================= */
 
 .modal-overlay,
@@ -861,9 +601,13 @@ footer p {
 
 .painting-modal {
   display: grid;
-
   grid-template-columns: 1fr 1fr;
 }
+
+
+/* =========================
+   IMAGEN MODAL
+========================= */
 
 .modal-image-container {
   min-height: 560px;
@@ -871,27 +615,67 @@ footer p {
   background: #eee;
 
   overflow: hidden;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .modal-image-container img {
   width: 100%;
   height: 100%;
-
   object-fit: cover;
+}
 
-  animation:
-    pinturaModal 7s ease-in-out infinite alternate;
+
+/*
+   IMPORTANTE:
+
+   Cuando se abre la pintura,
+   la imagen también se mueve.
+
+   Se mantiene contain para que
+   se vea completa.
+*/
+
+.modal-image-container .painting-motion {
+  width: auto !important;
+  height: auto !important;
+
+  max-width: 100% !important;
+  max-height: 530px !important;
+
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  object-fit: contain !important;
+
+  display: block;
+
+  margin: auto;
 
   transform-origin: center center;
+
+  animation:
+    pinturaModal
+    8s
+    ease-in-out
+    infinite
+    alternate !important;
+
+  will-change: transform;
 }
+
+
+/* =========================
+   INFO MODAL
+========================= */
 
 .modal-info {
   padding: 48px;
 
   display: flex;
-
   flex-direction: column;
-
   justify-content: center;
 }
 
@@ -939,6 +723,7 @@ footer p {
 
 .add-cart {
   background: #211d1a;
+
   color: #fff;
 }
 
@@ -946,6 +731,7 @@ footer p {
 .purchase-button,
 .checkout-button {
   background: var(--accent);
+
   color: #fff;
 }
 
@@ -975,12 +761,27 @@ footer p {
 
   border-radius: 50%;
 
-  background: rgba(255, 255, 255, 0.94);
+  background:
+    rgba(255, 255, 255, 0.94);
 
   font-size: 28px;
 
   line-height: 1;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
 }
+
+.close-modal:hover,
+.contact-close:hover,
+.purchase-close:hover,
+.close-cart:hover {
+  transform: rotate(90deg);
+
+  background: #fff;
+}
+
 
 /* =========================
    CART
@@ -1047,6 +848,17 @@ footer p {
   border-radius: 8px;
 
   object-fit: cover;
+
+  /*
+    También se mueve suavemente
+    la imagen del carrito.
+  */
+  animation:
+    carritoImagen
+    6s
+    ease-in-out
+    infinite
+    alternate;
 }
 
 .cart-item-info {
@@ -1107,6 +919,7 @@ footer p {
   width: 100%;
 }
 
+
 /* =========================
    FORMS
 ========================= */
@@ -1146,7 +959,10 @@ footer p {
   display: grid;
 
   grid-template-columns:
-    repeat(2, minmax(0, 1fr));
+    repeat(
+      2,
+      minmax(0, 1fr)
+    );
 
   gap: 17px;
 }
@@ -1164,8 +980,7 @@ footer p {
 }
 
 .form-group input,
-.form-group textarea,
-.form-group select {
+.form-group textarea {
   width: 100%;
 
   min-width: 0;
@@ -1184,12 +999,12 @@ footer p {
 }
 
 .form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus {
+.form-group textarea:focus {
   border-color: var(--accent);
 
   box-shadow:
-    0 0 0 3px rgba(154, 107, 69, 0.12);
+    0 0 0 3px
+    rgba(154, 107, 69, 0.12);
 }
 
 .form-group textarea {
@@ -1228,6 +1043,13 @@ footer p {
   object-fit: cover;
 
   border-radius: 8px;
+
+  animation:
+    compraImagen
+    6s
+    ease-in-out
+    infinite
+    alternate;
 }
 
 .purchase-summary h3 {
@@ -1243,6 +1065,7 @@ footer p {
 
   cursor: not-allowed;
 }
+
 
 /* =========================
    EMPTY CART
@@ -1260,6 +1083,7 @@ footer p {
   font-size: 48px;
 }
 
+
 /* =========================
    SWEET ALERT
 ========================= */
@@ -1270,14 +1094,306 @@ footer p {
   font-size: 14px;
 }
 
-/* =========================
+
+/* =====================================================
+   ANIMACIONES
+===================================================== */
+
+
+/*
+   1. ANIMACIÓN PRINCIPAL
+   Todas las imágenes de las pinturas
+*/
+
+@keyframes pinturaRespira {
+
+  0% {
+    transform:
+      scale(1.015)
+      translate3d(
+        -0.3%,
+        -0.2%,
+        0
+      );
+  }
+
+  25% {
+    transform:
+      scale(1.025)
+      translate3d(
+        0.15%,
+        0.1%,
+        0
+      );
+  }
+
+  50% {
+    transform:
+      scale(1.035)
+      translate3d(
+        0.2%,
+        0.15%,
+        0
+      );
+  }
+
+  75% {
+    transform:
+      scale(1.045)
+      translate3d(
+        -0.1%,
+        0.2%,
+        0
+      );
+  }
+
+  100% {
+    transform:
+      scale(1.055)
+      translate3d(
+        0.35%,
+        -0.15%,
+        0
+      );
+  }
+}
+
+
+/*
+   2. ANIMACIÓN DE LA PINTURA ABIERTA
+*/
+
+@keyframes pinturaModal {
+
+  0% {
+    transform:
+      scale(1.01)
+      translate3d(
+        -0.25%,
+        0,
+        0
+      );
+  }
+
+  25% {
+    transform:
+      scale(1.02)
+      translate3d(
+        0.15%,
+        -0.05%,
+        0
+      );
+  }
+
+  50% {
+    transform:
+      scale(1.03)
+      translate3d(
+        0.2%,
+        0.1%,
+        0
+      );
+  }
+
+  75% {
+    transform:
+      scale(1.038)
+      translate3d(
+        -0.15%,
+        0,
+        0
+      );
+  }
+
+  100% {
+    transform:
+      scale(1.045)
+      translate3d(
+        0.25%,
+        -0.15%,
+        0
+      );
+  }
+}
+
+
+/*
+   3. ANIMACIÓN DE FAVORITOS
+*/
+
+.favorite-card-image img {
+  transform-origin: center center;
+
+  animation:
+    favoritoRespira
+    8s
+    ease-in-out
+    infinite
+    alternate;
+
+  will-change: transform;
+}
+
+@keyframes favoritoRespira {
+
+  0% {
+    transform:
+      scale(1.01)
+      translate3d(
+        -0.2%,
+        0,
+        0
+      );
+  }
+
+  50% {
+    transform:
+      scale(1.03)
+      translate3d(
+        0.15%,
+        -0.1%,
+        0
+      );
+  }
+
+  100% {
+    transform:
+      scale(1.045)
+      translate3d(
+        0.2%,
+        -0.15%,
+        0
+      );
+  }
+}
+
+
+/*
+   4. ANIMACIÓN DEL ENCABEZADO
+*/
+
+@keyframes heroImagen {
+
+  0% {
+    background-position:
+      48% 50%;
+
+    background-size:
+      100%;
+  }
+
+  25% {
+    background-position:
+      50% 49%;
+
+    background-size:
+      102%;
+  }
+
+  50% {
+    background-position:
+      52% 48%;
+
+    background-size:
+      103%;
+  }
+
+  75% {
+    background-position:
+      50% 51%;
+
+    background-size:
+      104%;
+  }
+
+  100% {
+    background-position:
+      48% 52%;
+
+    background-size:
+      106%;
+  }
+}
+
+
+/*
+   5. ANIMACIÓN DEL LOGO
+*/
+
+@keyframes logoEntrada {
+
+  0% {
+    opacity: 0;
+
+    transform:
+      translateY(-12px);
+  }
+
+  100% {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+
+/*
+   6. IMAGEN DEL CARRITO
+*/
+
+@keyframes carritoImagen {
+
+  0% {
+    transform:
+      scale(1);
+  }
+
+  50% {
+    transform:
+      scale(1.025)
+      translateX(0.5px);
+  }
+
+  100% {
+    transform:
+      scale(1.04)
+      translateX(-0.5px);
+  }
+}
+
+
+/*
+   7. IMAGEN DEL RESUMEN DE COMPRA
+*/
+
+@keyframes compraImagen {
+
+  0% {
+    transform:
+      scale(1);
+  }
+
+  100% {
+    transform:
+      scale(1.04)
+      translateY(-1px);
+  }
+}
+
+
+/* =====================================================
    TABLET
-========================= */
+===================================================== */
 
 @media (max-width: 1100px) {
+
   .gallery-grid {
     grid-template-columns:
-      repeat(3, minmax(0, 1fr));
+      repeat(
+        3,
+        minmax(0, 1fr)
+      );
   }
 
   .header {
@@ -1287,18 +1403,15 @@ footer p {
   .header nav {
     gap: 14px;
   }
-
-  .favorites-grid {
-    grid-template-columns:
-      repeat(3, minmax(0, 1fr));
-  }
 }
 
-/* =========================
+
+/* =====================================================
    TABLET / SMALL LAPTOP
-========================= */
+===================================================== */
 
 @media (max-width: 850px) {
+
   .app {
     width: 90%;
   }
@@ -1306,7 +1419,9 @@ footer p {
   .header {
     flex-wrap: wrap;
 
-    padding: 12px 4%;
+    padding:
+      12px
+      4%;
   }
 
   .header nav {
@@ -1326,7 +1441,9 @@ footer p {
   .hero {
     min-height: 500px;
 
-    padding: 70px 5%;
+    padding:
+      70px
+      5%;
   }
 
   .painting-modal {
@@ -1347,22 +1464,15 @@ footer p {
   .purchase-modal {
     padding: 30px;
   }
-
-  .favorites-modal {
-    padding: 25px;
-  }
-
-  .favorites-grid {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
-  }
 }
 
-/* =========================
+
+/* =====================================================
    MOBILE
-========================= */
+===================================================== */
 
 @media (max-width: 600px) {
+
   .app {
     width: 100%;
   }
@@ -1408,9 +1518,12 @@ footer p {
 
     margin: 0;
 
-    padding: 0 14px;
+    padding:
+      0 14px;
 
-    border: 1px solid var(--border);
+    border:
+      1px solid
+      var(--border);
 
     border-radius: 8px;
 
@@ -1460,7 +1573,8 @@ footer p {
 
     justify-content: center;
 
-    padding: 0 12px;
+    padding:
+      0 12px;
 
     font-size: 13px;
   }
@@ -1475,32 +1589,51 @@ footer p {
     font-size: 13px;
   }
 
+
+  /* HERO */
+
   .hero {
     min-height: 470px;
 
-    padding: 55px 5%;
+    padding:
+      55px
+      5%;
 
-    background-position: 60% center;
+    background-position:
+      60%
+      center;
   }
 
   .hero h2 {
     font-size:
-      clamp(36px, 11vw, 50px);
+      clamp(
+        36px,
+        11vw,
+        50px
+      );
   }
 
   .hero-content > p:not(.subtitle) {
     font-size: 15px;
   }
 
+
+  /* GALERÍA */
+
   .gallery-section {
     width: 100%;
 
-    padding: 60px 2.5%;
+    padding:
+      60px
+      2.5%;
   }
 
   .gallery-grid {
     grid-template-columns:
-      repeat(2, minmax(0, 1fr));
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
 
     gap: 12px;
   }
@@ -1531,72 +1664,8 @@ footer p {
     font-size: 20px;
   }
 
-  /* FAVORITOS MOBILE */
 
-  .favorites-overlay {
-    padding: 10px;
-
-    align-items: flex-start;
-  }
-
-  .favorites-modal {
-    width: 100%;
-
-    max-height:
-      calc(100vh - 20px);
-
-    padding: 20px;
-
-    border-radius: 16px;
-  }
-
-  .favorites-modal-header {
-    padding-bottom: 18px;
-  }
-
-  .favorites-modal-header h2 {
-    font-size: 30px;
-  }
-
-  .favorites-modal-header span {
-    font-size: 13px;
-  }
-
-  .favorites-grid {
-    grid-template-columns: 1fr;
-
-    gap: 16px;
-
-    padding-top: 20px;
-  }
-
-  .favorite-card {
-    display: grid;
-
-    grid-template-columns: 115px 1fr;
-  }
-
-  .favorite-card-image {
-    aspect-ratio: 4 / 5;
-  }
-
-  .favorite-card-info {
-    display: flex;
-
-    flex-direction: column;
-
-    justify-content: center;
-
-    padding: 15px;
-  }
-
-  .favorite-card-info h3 {
-    font-size: 17px;
-  }
-
-  .favorite-card-info p {
-    font-size: 15px;
-  }
+  /* MODAL */
 
   .modal-overlay,
   .contact-modal-overlay,
@@ -1612,7 +1681,9 @@ footer p {
     width: 100%;
 
     max-height:
-      calc(100vh - 20px);
+      calc(
+        100vh - 20px
+      );
 
     border-radius: 15px;
   }
@@ -1623,8 +1694,14 @@ footer p {
     max-height: 42vh;
   }
 
+  .modal-image-container .painting-motion {
+    max-height: 42vh !important;
+  }
+
   .modal-info {
-    padding: 25px 20px;
+    padding:
+      25px
+      20px;
   }
 
   .modal-info h2 {
@@ -1635,9 +1712,14 @@ footer p {
     font-size: 25px;
   }
 
+
+  /* FORMULARIOS */
+
   .contact-modal,
   .purchase-modal {
-    padding: 25px 18px;
+    padding:
+      25px
+      18px;
   }
 
   .contact-modal-header h2,
@@ -1651,6 +1733,9 @@ footer p {
     gap: 17px;
   }
 
+
+  /* COMPRA */
+
   .purchase-summary img {
     width: 70px;
 
@@ -1658,27 +1743,42 @@ footer p {
   }
 
   .purchase-summary {
-    align-items: flex-start;
+    align-items:
+      flex-start;
   }
+
+
+  /* CARRITO */
 
   .cart-drawer {
     width: 100%;
 
-    padding: 20px 16px;
+    padding:
+      20px
+      16px;
   }
 
+
+  /* ABOUT */
+
   .about {
-    padding: 70px 6%;
+    padding:
+      70px
+      6%;
   }
 }
 
-/* =========================
+
+/* =====================================================
    VERY SMALL PHONES
-========================= */
+===================================================== */
 
 @media (max-width: 380px) {
+
   .header {
-    padding: 10px 3%;
+    padding:
+      10px
+      3%;
   }
 
   .logo h1 {
@@ -1714,9 +1814,12 @@ footer p {
 
     margin: 0;
 
-    padding: 0 14px;
+    padding:
+      0 14px;
 
-    border: 1px solid var(--border);
+    border:
+      1px solid
+      var(--border);
 
     border-radius: 8px;
 
@@ -1768,7 +1871,8 @@ footer p {
 
     font-size: 12px;
 
-    padding: 0 10px;
+    padding:
+      0 10px;
   }
 
   .gallery-grid {
@@ -1792,60 +1896,42 @@ footer p {
   }
 
   .modal-info {
-    padding: 20px 15px;
-  }
-
-  .favorite-card {
-    grid-template-columns: 100px 1fr;
-  }
-
-  .favorite-card-info {
-    padding: 10px;
-  }
-
-  .favorite-card-info h3 {
-    font-size: 15px;
-  }
-
-  .favorite-card-info p {
-    font-size: 14px;
-  }
-
-  .favorite-card-info button {
-    min-height: 36px;
-
-    font-size: 12px;
+    padding:
+      20px
+      15px;
   }
 }
 
-/* =========================
-   REDUCED MOTION
-========================= */
+
+/* =====================================================
+   REDUCIR ANIMACIONES SI EL USUARIO LO SOLICITA
+===================================================== */
 
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
 
   .painting-motion,
-  .modal-image-container img,
-  .favorite-card-image img {
+  .modal-image-container .painting-motion,
+  .favorite-card-image img,
+  .cart-item img,
+  .purchase-summary img,
+  .hero,
+  .logo {
+
     animation: none !important;
+
     transition: none !important;
   }
+
+  .painting-card:hover {
+    transform: none;
+  }
 }
+
 
 /* Prevent iOS zoom on form fields */
 
 @media (max-width: 600px) {
+
   input,
   textarea,
   select {
